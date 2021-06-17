@@ -16,10 +16,10 @@ ADC_MODE(ADC_VCC);
 #endif
 
 // -------- MQTT broker ---------- //
-#define HOST        "192.168.0.8"
+#define HOST        "192.168.0.0"
 #define PORT        1883
 #define USERNAME    "admin"
-#define PASSWORD    "123456780"
+#define PASSWORD    "mqttpass"
 
 // ---------- DHT -------- //
 // capacitive humidity and thermistor
@@ -31,8 +31,8 @@ const int intervall = 60000;  //milliseconds to sleep
 const int timeout = 200;  //time out loop count
 
 // ---------- LAN ------------- //
-#define WLAN_SSID   "Edma_Pergola"
-#define WLAN_PASS   "pes_Fido"
+#define WLAN_SSID   "wifissid"
+#define WLAN_PASS   "wifipass"
 WiFiClient client;
 Adafruit_MQTT_Client mqtt(&client, HOST, PORT, USERNAME, PASSWORD);
 Adafruit_MQTT_Publish temperature = Adafruit_MQTT_Publish(&mqtt, "weatherStation/temperaturesklenik"); // These relate to node red
