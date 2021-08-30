@@ -2,3 +2,4 @@ ML8511 UV sensor - https://github.com/RobTillaart/ML8511
 DHT11/22 Temperature & Humidity - https://github.com/adafruit/DHT-sensor-library
 BH1750 Light intensity - https://github.com/claws/BH1750
 BMP180 Temperature & Pressure - https://github.com/adafruit/Adafruit_BMP085_Unified
+I2C Bus (Wire.h) - Integrated by default in Arduino IDE
