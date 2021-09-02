@@ -6,7 +6,7 @@
 
 
 // -------- MQTT broker ---------- //
-#define HOST        "192.168.0.78"
+#define HOST        "192.168.0.8"
 #define PORT        1883
 #define USERNAME    "admin"
 #define PASSWORD    "123456780"
@@ -21,7 +21,7 @@ const int intervall = 6000;  //milliseconds to sleep
 const int timeout = 200;  //time out loop count
 
 // ---------- WLAN ------------ //
-#define WLAN_SSID   "Edma_Loznice"
+#define WLAN_SSID   "Edma_Pergola"
 #define WLAN_PASS   "pes_Fido"
 
 WiFiClient client;
