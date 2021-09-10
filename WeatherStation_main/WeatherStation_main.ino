@@ -20,10 +20,11 @@
 //Wi-Fi settings (2.4GHz ONLY)
 const char* ssid     = "your-ssid";
 const char* password = "your-password";
-WiFiClient client;
 
-//MQTT topic list
+
+//MQTT
 Adafruit_MQTT_Client mqtt(&client, HOST, PORT, USERNAME, PASSWORD);
+WiFiClient client;
 //weather data
 Adafruit_MQTT_Publish temperature = Adafruit_MQTT_Publish(&mqtt, "weatherStation/tempM");
 Adafruit_MQTT_Publish pressure = Adafruit_MQTT_Publish(&mqtt, "weatherStation/presM");
@@ -38,12 +39,42 @@ Adafruit_MQTT_Publish raingauge = Adafruit_MQTT_Publish(&mqtt, "weatherStation/r
 Adafruit_MQTT_Publish batterytemp = Adafruit_MQTT_Publish(&mqtt, "weatherStation/battempM");
 Adafruit_MQTT_Publish batteryperc = Adafruit_MQTT_Publish(&mqtt, "weatherStation/batpercM");
 Adafruit_MQTT_Publish heating = Adafruit_MQTT_Publish(&mqtt, "weatherStation/heatM");
-Adafruit_MQTT_Publish fanrmp = Adafruit_MQTT_Publish(&mqtt, "weatherStation/fanM");
 
+
+//Wifi connect code
+void initWiFi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi ..");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print('.');
+    delay(1000);
+  }
+  Serial.println(WiFi.localIP());
+}
+
+//Sensor setup 
+//DHT
+#define DHTPIN 4 
+#define DHTTYPE DHT22 
+DHT dht(DHTPIN, DHTTYPE);
+
+//ML8511
+#define ANALOGPIN     A0
+ML8511 light(ANALOGPIN);
+
+//BH1750
+BH1750 lightMeter;
+
+//BMP180
+SFE_BMP180 pressure;
 
 
 void setup() {
+
+  
 Serial.begin(9600);
+initWiFi();
 
 
 
