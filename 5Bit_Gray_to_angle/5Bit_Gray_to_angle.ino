@@ -1,10 +1,10 @@
 void setup() {
   // put your setup code here, to run once:
-pinMode(1, INPUT);
 pinMode(2, INPUT);
 pinMode(3, INPUT);
 pinMode(4, INPUT);
 pinMode(5, INPUT);
+pinMode(6, INPUT);
 Serial.begin(9600);
 }
 void loop() {
@@ -14,13 +14,13 @@ bool D2 = 0;
 bool D3 = 0;
 bool D4 = 0;
 bool D5 = 0;
-short WW = 0;
+float WW = 0;
 
-D1 = digitalRead(1);
-D2 = digitalRead(2);
-D3 = digitalRead(3);
-D4 = digitalRead(4);
-D5 = digitalRead(5);
+D1 = digitalRead(2);
+D2 = digitalRead(3);
+D3 = digitalRead(4);
+D4 = digitalRead(5);
+D5 = digitalRead(6);
 
 if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 0) {
   WW = 0;
@@ -123,5 +123,6 @@ else {
   WW=0;
   }
 Serial.print(WW);
+Serial.print(" ");
 delay(1000);
 }
