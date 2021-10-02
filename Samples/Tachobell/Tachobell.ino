@@ -1,14 +1,4 @@
-// Easy Peasy Tachometer
-//James May
-//#include <Wire.h>
-//#include <Adafruit_SSD1306.h>// You may have to edit library for 128x64, //default is 128 x 32.
 
-//#define OLED_WIDTH 128
-//#define OLED_HEIGHT 64
-
-//#define OLED_ADDR   0x3C // A very common address for these displays.
-
-//Adafruit_SSD1306 display(OLED_WIDTH, OLED_HEIGHT);
 
 
 float value=0;
@@ -25,7 +15,7 @@ rev++;
 void setup()
 {
  Serial.begin(9600);
-pinMode(2, INPUT);
+pinMode(18, INPUT);
 attachInterrupt(0,isr,FALLING);  //attaching the interrupt
 
 
