@@ -3,7 +3,7 @@
  
  
 BH1750 lightMeter;
- 
+float lux = 0; 
  
 void setup(){
   Serial.begin(9600);
@@ -13,9 +13,9 @@ void setup(){
  
  
 void loop() {
-  uint16_t lux = lightMeter.readLightLevel();
+  lux = lightMeter.readLightLevel();
   Serial.print("Light: ");
   Serial.print(lux);
-  Serial.println(" lx");
+  Serial.println(" lux");
   delay(1000);
 }
