@@ -1,4 +1,4 @@
-//Majkl's Weather Station with ESP32, MQTT, BMP180, BH1750, DHT22, ML8511, Wind vane, Rain gauge and Anemometer
+//Majkl's Weather Station with ESP32, MQTT, BMP180, BH1750, DHT22, ML8511, Wind vane and Anemometer
 
 //Required libraries
 #include "Adafruit_MQTT.h"
@@ -34,10 +34,9 @@ Adafruit_MQTT_Publish lightintensity = Adafruit_MQTT_Publish(&mqtt, "weatherStat
 Adafruit_MQTT_Publish uvintensity = Adafruit_MQTT_Publish(&mqtt, "weatherStation/uvinM");
 Adafruit_MQTT_Publish winddirection = Adafruit_MQTT_Publish(&mqtt, "weatherStation/wdirM");
 Adafruit_MQTT_Publish windspeed = Adafruit_MQTT_Publish(&mqtt, "weatherStation/wspeM");
-Adafruit_MQTT_Publish raingauge = Adafruit_MQTT_Publish(&mqtt, "weatherStation/rainM");
+
 //system data
-Adafruit_MQTT_Publish batterytemp = Adafruit_MQTT_Publish(&mqtt, "weatherStation/battempM");
-Adafruit_MQTT_Publish batteryperc = Adafruit_MQTT_Publish(&mqtt, "weatherStation/batpercM");
+
 Adafruit_MQTT_Publish heating = Adafruit_MQTT_Publish(&mqtt, "weatherStation/heatM");
 
 
