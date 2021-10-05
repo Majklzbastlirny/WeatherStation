@@ -17,11 +17,11 @@
 //   EN = ENABLE
 
 
-#include <Arduino.h>
+
 #include <ML8511.h>
 
 #define ANALOGPIN     A0
-
+float UV = 0;
 // Connect EN to 3V3 to explicitly 
 // enable the sensor continuously
 ML8511 light(ANALOGPIN);
@@ -29,15 +29,16 @@ ML8511 light(ANALOGPIN);
 
 void setup()
 {
-  Serial.begin(115200);
-  Serial.println(__FILE__);
+  Serial.begin(9600);
   Serial.println("UV UltraViolet ML8511");
+  light.setVoltsPerStep(3.3, 4095);      // 12 bit DAC
+
 }
 
 
 void loop()
 {
-  float UV = light.getUV();
+  UV = light.getUV();
   Serial.print(UV, 4);
   Serial.println(" mW cm^2");
   delay(1000);
