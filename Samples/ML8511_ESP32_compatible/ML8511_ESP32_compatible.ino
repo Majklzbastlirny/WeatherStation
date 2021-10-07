@@ -1,19 +1,19 @@
 
 #include <ML8511.h>
 
-#define ANALOGPIN     32 //až 35
-#define ENABLEPIN     7
+#define ANALOGPIN     32 //32 až 35
 
-ML8511 light(ANALOGPIN);
+
+ML8511 light(32);
 
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
  
   
   // adjust to your ADC specification.
-  light.setVoltsPerStep(3.3, 4096);      // 12 bit ADC
+  light.setVoltsPerStep(3.3, 4095);      // 12 bit ADC
 }
 
 
