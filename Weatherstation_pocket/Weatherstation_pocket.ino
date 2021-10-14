@@ -17,11 +17,11 @@
 DHT dht(DHTPIN, DHT11); // dht object of DHT class
 
 // --------- Time ------------- //
-const int intervall = 6000;  //milliseconds to sleep
+const int intervall = 60000;  //milliseconds to sleep
 const int timeout = 200;  //time out loop count
 
 // ---------- WLAN ------------ //
-#define WLAN_SSID   "Edma_Pergola"
+#define WLAN_SSID   "Edma"
 #define WLAN_PASS   "pes_Fido"
 
 WiFiClient client;
@@ -56,7 +56,7 @@ void setup()
 
   MQTT_connect();
   delay(100);
-  temperature.publish(dht.readTemperature());
+  temperature.publish(dht.readTemperature()-2);
   delay(100);
   humidity.publish(dht.readHumidity());
   delay(250);

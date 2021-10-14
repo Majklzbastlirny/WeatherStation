@@ -122,7 +122,18 @@ else if (D1 == 1 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 0) {
 else {
   WW=0;
   }
-Serial.print(WW);
+Serial.println(WW);
+Serial.println("");
+//Serial.println(D1, D2, D3, D4, D5);
+Serial.print(D1);
+Serial.print(" ");
+Serial.print(D2);
+Serial.print(" ");
+Serial.print(D3);
+Serial.print(" ");
+Serial.print(D4);
+Serial.print(" ");
+Serial.print(D5);
 Serial.print(" ");
 delay(1000);
 }
