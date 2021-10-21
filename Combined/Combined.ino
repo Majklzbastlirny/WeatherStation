@@ -18,6 +18,7 @@
 float td = 0;
  ****************************************************/
 #include <WiFi.h>
+#include <BH1750.h>
 float hd = 0;
 float td = 0;
 #include "Adafruit_MQTT.h"
@@ -30,6 +31,8 @@ float td = 0;
 #define ALTITUDE 333 //Altitude where I live (change this to your altitude)
 DHT dht(DHTPIN, DHTTYPE);
 SFE_BMP180 pressure; //Creating an object
+BH1750 lightMeter;
+float lux = 0; 
 /************************* WiFi Access Point *********************************/
 
 #define WLAN_SSID       "MediumRecords"
@@ -58,6 +61,8 @@ Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO
 // Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
 Adafruit_MQTT_Publish photocell = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/photocell");
 Adafruit_MQTT_Publish uwu = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/uwu");
+Adafruit_MQTT_Publish lit = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/lit");
+
 // Setup a feed called 'onoff' for subscribing to changes.
 Adafruit_MQTT_Subscribe onoffbutton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/onoff");
 
@@ -69,6 +74,7 @@ Adafruit_MQTT_Subscribe onoffbutton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAM
 void setup() {
   
   Serial.begin(115200);
+  lightMeter.begin();
   delay(10);
  dht.begin(); 
  delay(250);
@@ -82,6 +88,7 @@ if (isnan(hd) || isnan(td)) {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
+  lux = lightMeter.readLightLevel();
 
 
   
@@ -161,13 +168,14 @@ char status;
     }
   }  
   delay(1);
+lux = lightMeter.readLightLevel();
 
 if (isnan(hd) || isnan(td)) {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
 
-  
+ 
   // Compute heat index in Celsius (isFahreheit = false)
 
 
@@ -204,6 +212,11 @@ if (isnan(hd) || isnan(td)) {
     Serial.println(F("OK!"));
   }
 
+if (! lit.publish(lux)) {
+    Serial.println(F("Failed"));
+  } else {
+    Serial.println(F("OK!"));
+  }
   // ping the server to keep the mqtt connection alive
   // NOT required if you are publishing once every KEEPALIVE seconds
   /*
