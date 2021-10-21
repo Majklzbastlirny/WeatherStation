@@ -16,11 +16,11 @@ bool D4 = 0;
 bool D5 = 0;
 float WW = 0;
 
-D1 = digitalRead(2);
-D2 = digitalRead(3);
+D5 = digitalRead(2);
+D4 = digitalRead(3);
 D3 = digitalRead(4);
-D4 = digitalRead(5);
-D5 = digitalRead(6);
+D2 = digitalRead(5);
+D1 = digitalRead(6);
 
 if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 0) {
   WW = 0;
@@ -122,8 +122,8 @@ else if (D1 == 1 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 0) {
 else {
   WW=0;
   }
-Serial.println(WW);
-Serial.println("");
+Serial.print(WW);
+Serial.print("   ");
 //Serial.println(D1, D2, D3, D4, D5);
 Serial.print(D1);
 Serial.print(" ");
@@ -134,6 +134,6 @@ Serial.print(" ");
 Serial.print(D4);
 Serial.print(" ");
 Serial.print(D5);
-Serial.print(" ");
+Serial.println("");
 delay(1000);
 }
