@@ -1,22 +1,3 @@
-/***************************************************
-  Adafruit MQTT Library ESP8266 Example
-
-  Must use ESP8266 Arduino from:
-    https://github.com/esp8266/Arduino
-
-  Works great with Adafruit's Huzzah ESP board & Feather
-  ----> https://www.adafruit.com/product/2471
-  ----> https://www.adafruit.com/products/2821
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Tony DiCola for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
- float hd = 0;
-float td = 0;
- ****************************************************/
 #include <WiFi.h>
 #include <BH1750.h>
 float hd = 0;
@@ -33,47 +14,42 @@ DHT dht(DHTPIN, DHTTYPE);
 SFE_BMP180 pressure; //Creating an object
 BH1750 lightMeter;
 float lux = 0; 
+#define LEDDIAG 2
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID       "MediumRecords"
-#define WLAN_PASS       "123456780"
+#define WLAN_SSID         "MediumRecords"
+#define WLAN_PASS         "123456780"
 
-/************************* Adafruit.io Setup *********************************/
+/************************* MQTT Broker Setup *********************************/
 
-#define AIO_SERVER      "bladyhel.serveminecraft.net"
-#define AIO_SERVERPORT  21                  // use 8883 for SSL
-#define AIO_USERNAME    "admin"
-#define AIO_KEY         "123456780"
+#define MQTT_BROKER_IP    "bladyhel.serveminecraft.net"
+#define MQTT_BROKER_PORT  21    //default port is 1883
+#define MQTT_USERNAME     "admin"
+#define MQTT_PASSWORD     "123456780"
 
 /************ Global State (you don't need to change this!) ******************/
 
-// Create an ESP8266 WiFiClient class to connect to the MQTT server.
 WiFiClient client;
-// or... use WiFiClientSecure for SSL
-//WiFiClientSecure client;
 
-// Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
-Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
+Adafruit_MQTT_Client mqtt(&client, MQTT_BROKER_IP, MQTT_BROKER_PORT, MQTT_USERNAME, MQTT_PASSWORD);
 
-/****************************** Feeds ***************************************/
+/************************* MQTT Topics ***************************************/
 
-// Setup a feed called 'photocell' for publishing.
-// Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
-Adafruit_MQTT_Publish photocell = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/photocell");
-Adafruit_MQTT_Publish uwu = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/uwu");
-Adafruit_MQTT_Publish lit = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/lit");
-
-// Setup a feed called 'onoff' for subscribing to changes.
-Adafruit_MQTT_Subscribe onoffbutton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/onoff");
+Adafruit_MQTT_Publish temperature = Adafruit_MQTT_Publish(&mqtt, "weatherStation/temperature");
+Adafruit_MQTT_Publish humidity = Adafruit_MQTT_Publish(&mqtt, "weatherStation/humidity");
+Adafruit_MQTT_Publish light = Adafruit_MQTT_Publish(&mqtt, "weatherStation/light");
+Adafruit_MQTT_Publish presss = Adafruit_MQTT_Publish(&mqtt, "weatherStation/pressure");
 
 /*************************** Sketch Code ************************************/
 
 // Bug workaround for Arduino 1.6.6, it seems to need a function declaration
-// for some reason (only affects ESP8266, likely an arduino-builder bug).
+
 
 void setup() {
-  
-  Serial.begin(115200);
+pinMode(LEDDIAG, OUTPUT);  
+//WiFi.setHostname(hostname.c_str()); //define hostname
+
+  Serial.begin(9600);
   lightMeter.begin();
   delay(10);
  dht.begin(); 
@@ -117,15 +93,16 @@ if (isnan(hd) || isnan(td)) {
   Serial.println("IP address: "); Serial.println(WiFi.localIP());
 
   // Setup MQTT subscription for onoff feed.
-  mqtt.subscribe(&onoffbutton);
+  
 }
-
+int rescnt = 0;
 uint32_t x=0;
 
 void loop() {
   // Ensure the connection to the MQTT server is alive (this will make the first
   // connection and automatically reconnect when disconnected).  See the MQTT_connect
   // function definition further below.
+digitalWrite(LEDDIAG, LOW);  
   MQTT_connect();
 
   // this is our 'wait for incoming subscription packets' busy subloop
@@ -189,34 +166,37 @@ if (isnan(hd) || isnan(td)) {
 
   
 
-  Adafruit_MQTT_Subscribe *subscription;
-  while ((subscription = mqtt.readSubscription(5000))) {
-    if (subscription == &onoffbutton) {
-      Serial.print(F("Got: "));
-      Serial.println((char *)onoffbutton.lastread);
-    }
-  }
+
 
   // Now we can publish stuff!
-  Serial.print(F("\nSending photocell val "));
+  Serial.print(F("\nSending temperature val "));
   Serial.print(T);
   Serial.print("...");
-  if (! photocell.publish(T)) {
+  if (! temperature.publish(T)) {
     Serial.println(F("Failed"));
   } else {
     Serial.println(F("OK!"));
   }
-  if (! uwu.publish(hd)) {
+delay(150);  
+  if (! humidity.publish(hd)) {
     Serial.println(F("Failed"));
   } else {
     Serial.println(F("OK!"));
   }
+delay(150);
+if (! light.publish(lux)) {
+    Serial.println(F("Failed"));
+  } else {
+    Serial.println(F("OK!"));
+  }
+delay(150);
+ if (! presss.publish(P)) {
+    Serial.println(F("Failed"));
+  } else {
+    Serial.println(F("OK!"));
+  } 
 
-if (! lit.publish(lux)) {
-    Serial.println(F("Failed"));
-  } else {
-    Serial.println(F("OK!"));
-  }
+  
   // ping the server to keep the mqtt connection alive
   // NOT required if you are publishing once every KEEPALIVE seconds
   /*
@@ -224,6 +204,15 @@ if (! lit.publish(lux)) {
     mqtt.disconnect();
   }
   */
+rescnt++;
+if (rescnt == 360) {
+  ESP.restart();
+} else {
+  Serial.println(rescnt);
+}
+delay(10000);
+digitalWrite(LEDDIAG, HIGH ); 
+delay(100);   
 }
 
 // Function to connect and reconnect as necessary to the MQTT server.
