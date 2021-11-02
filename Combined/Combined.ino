@@ -15,6 +15,8 @@ SFE_BMP180 pressure; //Creating an object
 BH1750 lightMeter;
 float lux = 0; 
 #define LEDDIAG 2
+int UVOUT = 32; //Output from the sensor
+int REF_3V3 = 33; //3.3V power on the Arduino board
 /************************* WiFi Access Point *********************************/
 
 #define WLAN_SSID         "MediumRecords"
@@ -39,6 +41,8 @@ Adafruit_MQTT_Publish temperature = Adafruit_MQTT_Publish(&mqtt, "weatherStation
 Adafruit_MQTT_Publish humidity = Adafruit_MQTT_Publish(&mqtt, "weatherStation/humidity");
 Adafruit_MQTT_Publish light = Adafruit_MQTT_Publish(&mqtt, "weatherStation/light");
 Adafruit_MQTT_Publish presss = Adafruit_MQTT_Publish(&mqtt, "weatherStation/pressure");
+Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/UV");
+
 
 /*************************** Sketch Code ************************************/
 
@@ -58,7 +62,8 @@ hd = dht.readHumidity();
   // Read temperature as Celsius (the default)
 td = dht.readTemperature();
 
-
+pinMode(UVOUT, INPUT);
+pinMode(REF_3V3, INPUT);
 
 if (isnan(hd) || isnan(td)) {
     Serial.println(F("Failed to read from DHT sensor!"));
@@ -164,7 +169,35 @@ if (isnan(hd) || isnan(td)) {
   Serial.println(F(" °C "));
   Serial.print("Heat index: ");
 
+ int uvLevel = averageAnalogRead(UVOUT);
+  int refLevel = averageAnalogRead(REF_3V3);
+
+  //Use the 3.3V power pin as a reference to get a very accurate output value from sensor
+  float outputVoltage = 3.3 / refLevel * uvLevel;   // adjust outputVoltage to actual voltage in case you read negative values.
+
+  float uvIntensity = mapfloat(outputVoltage, 0.99, 2.8, 0.0, 15.0); //Convert the voltage to a UV intensity level
+ if (uvIntensity < 0) {
+  uvIntensity = 0;
+  }
+  else { 
+    uvIntensity = uvIntensity;
+  }
   
+  Serial.print("output: ");
+  Serial.print(refLevel);
+
+  Serial.print("ML8511 output: ");
+  Serial.print(uvLevel);
+
+  Serial.print(" / ML8511 voltage: ");
+  Serial.print(outputVoltage);
+
+  Serial.print(" / UV Intensity (mW/cm^2): ");
+  Serial.print(uvIntensity);
+
+  Serial.println();
+
+  delay(100);  
 
 
 
@@ -196,7 +229,12 @@ delay(150);
     Serial.println(F("OK!"));
   } 
 
-  
+delay(150);
+ if (! UV.publish(uvIntensity)) {
+    Serial.println(F("Failed"));
+  } else {
+    Serial.println(F("OK!"));
+  }  
   // ping the server to keep the mqtt connection alive
   // NOT required if you are publishing once every KEEPALIVE seconds
   /*
@@ -240,4 +278,22 @@ void MQTT_connect() {
        }
   }
   Serial.println("MQTT Connected!");
+}
+
+ int averageAnalogRead( int pinToRead)
+{
+  byte numberOfReadings = 8;
+   int runningValue = 0; 
+
+  for(int x = 0 ; x < numberOfReadings ; x++)
+    runningValue += analogRead(pinToRead);
+  runningValue /= numberOfReadings;
+
+  return(runningValue);  
+}
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+
 }
