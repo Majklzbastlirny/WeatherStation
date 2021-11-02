@@ -1,3 +1,8 @@
+/*
+Michal Basler E4
+Hlavní kód pro meteostanici.
+Dodatky zde: https://github.com/Majklzbastlirny/WeatherStation
+*/
 #include <WiFi.h>
 #include <BH1750.h>
 float hd = 0;
