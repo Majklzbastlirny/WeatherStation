@@ -4,31 +4,16 @@ Hlavní kód pro meteostanici.
 Dodatky zde: https://github.com/Majklzbastlirny/WeatherStation
 https://youtu.be/LY-1DHTxRAk?t=355
 */
-#include <WiFi.h>
-#include <BH1750.h>
-float hd = 0;
-float td = 0;
+
+/************************* Nutné knihovny ************************************/
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
-#include <Wire.h> //Including wire library
+#include <WiFi.h>
+#include <BH1750.h>
+#include <Wire.h>
 #include "DHT.h"
-#define DHTPIN 4  
-#define DHTTYPE DHT22 
-#include <SFE_BMP180.h> //Including BMP180 library
-#define ALTITUDE 333 //Altitude where I live (change this to your altitude)
-DHT dht(DHTPIN, DHTTYPE);
-SFE_BMP180 pressure; //Creating an object
-BH1750 lightMeter;
-float lux = 0; 
-#define LEDDIAG 2
-int UVOUT = 34; //Output from the sensor
-int REF_3V3 = 35; //3.3V power on the Arduino board
-bool D1 = 0;  
-bool D2 = 0;
-bool D3 = 0;
-bool D4 = 0;
-bool D5 = 0;
-float WW = 0;
+#include <SFE_BMP180.h>
+
 /************************* WiFi Access Point *********************************/
 
 #define WLAN_SSID         "MediumRecords"
@@ -56,7 +41,34 @@ Adafruit_MQTT_Publish presss = Adafruit_MQTT_Publish(&mqtt, "weatherStation/pres
 Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/UV");
 Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/WV");
 
+/******************* Globální proměnné, definice a objekty **************************************/
+#define LEDDIAG 2
+//Proměnné ke korouhvi
+bool D1 = 0;  
+bool D2 = 0;
+bool D3 = 0;
+bool D4 = 0;
+bool D5 = 0;
+float WW = 0;
 
+//Proměnné k senzoru intenzity UV zařízení
+int UVOUT = 34; 
+int REF_3V3 = 35; 
+
+//Proměnné k senzoru vlhkosti a teploty DHT22
+float hd = 0;
+float td = 0;
+#define DHTPIN 4  
+#define DHTTYPE DHT22
+DHT dht(DHTPIN, DHTTYPE); 
+
+//Proměnné k senzoru světla BH1750
+float lux = 0; 
+BH1750 lightMeter;
+
+//Proměnné k senzoru teploty a tlaku BMP180
+SFE_BMP180 pressure;
+#define ALTITUDE 333
 
 /*************************** Sketch Code ************************************/
 
