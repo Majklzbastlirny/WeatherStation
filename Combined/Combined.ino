@@ -2,6 +2,7 @@
 Michal Basler E4
 Hlavní kód pro meteostanici.
 Dodatky zde: https://github.com/Majklzbastlirny/WeatherStation
+https://youtu.be/LY-1DHTxRAk?t=355
 */
 #include <WiFi.h>
 #include <BH1750.h>
@@ -20,8 +21,8 @@ SFE_BMP180 pressure; //Creating an object
 BH1750 lightMeter;
 float lux = 0; 
 #define LEDDIAG 2
-int UVOUT = 32; //Output from the sensor
-int REF_3V3 = 33; //3.3V power on the Arduino board
+int UVOUT = 34; //Output from the sensor
+int REF_3V3 = 35; //3.3V power on the Arduino board
 bool D1 = 0;  
 bool D2 = 0;
 bool D3 = 0;
@@ -59,14 +60,15 @@ Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/WV");
 
 /*************************** Sketch Code ************************************/
 
-// Bug workaround for Arduino 1.6.6, it seems to need a function declaration
 
 
 void setup() {
+ 
+  Serial.print("Dns configured.");
 pinMode(LEDDIAG, OUTPUT);  
 //WiFi.setHostname(hostname.c_str()); //define hostname
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   lightMeter.begin();
   delay(10);
  dht.begin(); 
@@ -84,17 +86,17 @@ if (isnan(hd) || isnan(td)) {
   }
   lux = lightMeter.readLightLevel();
 
-pinMode(34, INPUT_PULLDOWN);
-pinMode(14, INPUT_PULLDOWN);
 pinMode(27, INPUT_PULLDOWN);
 pinMode(26, INPUT_PULLDOWN);
 pinMode(25, INPUT_PULLDOWN);
+pinMode(14, INPUT_PULLDOWN);
+pinMode(12, INPUT_PULLDOWN);
 
-D5 = digitalRead(34);
-D4 = digitalRead(14);
-D3 = digitalRead(27);
+D5 = digitalRead(12);
+D4 = digitalRead(13);
+D3 = digitalRead(25);
 D2 = digitalRead(26);
-D1 = digitalRead(25);
+D1 = digitalRead(27);
 
 
 
