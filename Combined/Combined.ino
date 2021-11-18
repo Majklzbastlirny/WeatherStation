@@ -159,17 +159,13 @@ if (isnan(hd) || isnan(td)) {
 
 
 void loop() {
-  // Ensure the connection to the MQTT server is alive (this will make the first
-  // connection and automatically reconnect when disconnected).  See the MQTT_connect
-  // function definition further below.
+  Serial.println("");
+  Serial.println("");
 
   
 digitalWrite(LEDDIAG, LOW);  
-  MQTT_connect();
-
-  // this is our 'wait for incoming subscription packets' busy subloop
-  // try to spend your time here
-
+ MQTT_connect();
+  
 char status;
   double T, P, p0; //Creating variables for temp, pressure and relative pressure
 
@@ -185,7 +181,7 @@ char status;
     if (status != 0) {
       Serial.print("Teplota: ");
       Serial.print(T, 1);
-      Serial.println(" deg C");
+      Serial.println(" °C");
 
       status = pressure.startPressure(3);
 
@@ -309,8 +305,9 @@ else if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 1) {
 else {
   WW=0;
   }
+Serial.print("Směr větru je: ");  
 Serial.print(WW);
-Serial.print("   ");
+Serial.print("°   ");
 //Serial.println(D1, D2, D3, D4, D5);
 Serial.print(D1);
 Serial.print(" ");
@@ -324,22 +321,19 @@ Serial.print(D5);
 Serial.println("");
 
 
-if (isnan(hd) || isnan(td)) {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
-  }
+
 
  
-  // Compute heat index in Celsius (isFahreheit = false)
+ 
 
 
-  Serial.print(F("Humidity: "));
+  Serial.print(F("Vlhkost: "));
   Serial.print(hd);
   Serial.println("%");
-  Serial.print(F("Temperature: "));
+  Serial.print(F("Teplota DHT22: "));
   Serial.print(td);
   Serial.println(F(" °C "));
-  Serial.print("Heat index: ");
+ 
 
  int uvLevel = averageAnalogRead(UVOUT);
   int refLevel = averageAnalogRead(REF_3V3);
@@ -355,19 +349,13 @@ if (isnan(hd) || isnan(td)) {
     uvIntensity = uvIntensity;
   }
   
-  Serial.print("output: ");
-  Serial.print(refLevel);
+ 
 
-  Serial.print("ML8511 output: ");
-  Serial.print(uvLevel);
-
-  Serial.print(" / ML8511 voltage: ");
-  Serial.print(outputVoltage);
-
-  Serial.print(" / UV Intensity (mW/cm^2): ");
+  Serial.print("UV intenzita (mW/cm^2): ");
   Serial.print(uvIntensity);
+  Serial.println("");
+  Serial.println("");
 
-  Serial.println();
 
   delay(100);  
 
@@ -430,6 +418,7 @@ if (rescnt == 360) {
   
   Serial.print("Počet provedených měření od restartu: ");
   Serial.println(rescnt);
+ 
 }
 delay(10000);
 digitalWrite(LEDDIAG, HIGH ); 
