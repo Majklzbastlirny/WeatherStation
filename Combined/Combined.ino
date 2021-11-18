@@ -42,6 +42,8 @@ Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/UV");
 Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/WV");
 
 /******************* Globální proměnné, definice a objekty **************************************/
+#define DOBA_HIBERNACE 10 //v minutách
+
 #define LEDDIAG 2
 int rescnt = 0;
 uint32_t x=0;
