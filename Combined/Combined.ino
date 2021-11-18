@@ -43,6 +43,9 @@ Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/WV");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 #define LEDDIAG 2
+int rescnt = 0;
+uint32_t x=0;
+
 //Proměnné ke korouhvi
 bool D1 = 0;  
 bool D2 = 0;
@@ -68,36 +71,22 @@ BH1750 lightMeter;
 
 //Proměnné k senzoru teploty a tlaku BMP180
 SFE_BMP180 pressure;
-#define ALTITUDE 333
+#define NadmVys 333
 
-/*************************** Sketch Code ************************************/
+/*************************** Vlastní kód ************************************/
 
 
 
 void setup() {
- 
-  Serial.print("Dns configured.");
+Serial.begin(115200);
+/******** Nastavení pinů ***********/
 pinMode(LEDDIAG, OUTPUT);  
-//WiFi.setHostname(hostname.c_str()); //define hostname
 
-  Serial.begin(115200);
-  lightMeter.begin();
-  delay(10);
- dht.begin(); 
- delay(250);
-hd = dht.readHumidity();
-  // Read temperature as Celsius (the default)
-td = dht.readTemperature();
-
+//Nastavení pinů pro UV senzor
 pinMode(UVOUT, INPUT);
 pinMode(REF_3V3, INPUT);
 
-if (isnan(hd) || isnan(td)) {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
-  }
-  lux = lightMeter.readLightLevel();
-
+//Nastavení pinů
 pinMode(27, INPUT_PULLDOWN);
 pinMode(26, INPUT_PULLDOWN);
 pinMode(25, INPUT_PULLDOWN);
@@ -110,21 +99,9 @@ D3 = digitalRead(25);
 D2 = digitalRead(26);
 D1 = digitalRead(27);
 
-
-
-  
- if (pressure.begin()) //If initialization was successful, continue
-    Serial.println("BMP180 init success");
-  else //Else, stop code forever
-  {
-    Serial.println("BMP180 init fail");
-    while (1);
-  }
-  Serial.println(F("Adafruit MQTT demo"));
-
-  // Connect to WiFi access point.
-  Serial.println(); Serial.println();
-  Serial.print("Connecting to ");
+//Připojení k WiFi
+  Serial.println();
+  Serial.print("Připojuji se k: ");
   Serial.println(WLAN_SSID);
 
   WiFi.begin(WLAN_SSID, WLAN_PASS);
@@ -134,24 +111,58 @@ D1 = digitalRead(27);
   }
   Serial.println();
 
-  Serial.println("WiFi connected");
-  Serial.println("IP address: "); Serial.println(WiFi.localIP());
+  Serial.println("Uspěšně připojeno");
+  Serial.println("Moje IP adresa: "); Serial.println(WiFi.localIP());
+  long rssi = WiFi.RSSI();
+  Serial.print("Síla WiFi signálu je: ");
+  Serial.print(rssi);
+  Serial.println(" dBm");
 
+
+
+
+  
+  lightMeter.begin();
+  delay(10);
+ dht.begin(); 
+ delay(250);
+hd = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+td = dht.readTemperature();
+
+
+
+if (isnan(hd) || isnan(td)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+  lux = lightMeter.readLightLevel();
+
+
+
+
+
+  
+ if (pressure.begin()) //If initialization was successful, continue
+    Serial.println("BMP180 init success");
+  else 
+  {
+    Serial.println("BMP180 init fail");
+    ESP.restart();
+  }
+  
+
+  
   // Setup MQTT subscription for onoff feed.
   
 }
-int rescnt = 0;
-uint32_t x=0;
+
 
 void loop() {
   // Ensure the connection to the MQTT server is alive (this will make the first
   // connection and automatically reconnect when disconnected).  See the MQTT_connect
   // function definition further below.
-D5 = digitalRead(12);
-D4 = digitalRead(14);
-D3 = digitalRead(27);
-D2 = digitalRead(26);
-D1 = digitalRead(25);
+
   
 digitalWrite(LEDDIAG, LOW);  
   MQTT_connect();
@@ -162,9 +173,9 @@ digitalWrite(LEDDIAG, LOW);
 char status;
   double T, P, p0; //Creating variables for temp, pressure and relative pressure
 
-  Serial.print("You provided altitude: ");
-  Serial.print(ALTITUDE, 0);
-  Serial.println(" meters");
+  Serial.print("Nadmořská výška stanice: ");
+  Serial.print(NadmVys, 0);
+  Serial.println(" m.n.m.");
 
   status = pressure.startTemperature();
   if (status != 0) {
@@ -172,7 +183,7 @@ char status;
 
     status = pressure.getTemperature(T);
     if (status != 0) {
-      Serial.print("Temp: ");
+      Serial.print("Teplota: ");
       Serial.print(T, 1);
       Serial.println(" deg C");
 
@@ -183,14 +194,14 @@ char status;
 
         status = pressure.getPressure(P, T);
         if (status != 0) {
-          Serial.print("Pressure measurement: ");
+          Serial.print("Absolutní tlak: ");
           Serial.print(P);
-          Serial.println(" hPa (Pressure measured using temperature)");
+          Serial.println(" hPa");
 
-          p0 = pressure.sealevel(P, ALTITUDE);
-          Serial.print("Relative (sea-level) pressure: ");
+          p0 = pressure.sealevel(P, NadmVys);
+          Serial.print("Relativní tlak: ");
           Serial.print(p0);
-          Serial.println("hPa");
+          Serial.println(" hPa");
         }
       }
     }
@@ -362,58 +373,62 @@ if (isnan(hd) || isnan(td)) {
 
 
 
-  // Now we can publish stuff!
-  Serial.print(F("\nSending temperature val "));
-  Serial.print(T);
-  Serial.print("...");
+/************** Poslání dat přes MQTT *******************/  
+  Serial.println(F("Probíhá odesílání dat na server"));
+  Serial.print(F("Probíhá odesílání teploty:"));
   if (! temperature.publish(T)) {
-    Serial.println(F("Failed"));
+    Serial.println(F(" Failed"));
   } else {
-    Serial.println(F("OK!"));
+    Serial.println(F(" OK!"));
   }
-delay(150);  
+delay(150); 
+
+  Serial.print(F("Probíhá odesílání vlhkosti:"));
   if (! humidity.publish(hd)) {
-    Serial.println(F("Failed"));
+    Serial.println(F(" Failed"));
   } else {
-    Serial.println(F("OK!"));
+    Serial.println(F(" OK!"));
   }
 delay(150);
+
+  Serial.print(F("Probíhá odesílání světelnosti:"));
 if (! light.publish(lux)) {
-    Serial.println(F("Failed"));
+    Serial.println(F(" Failed"));
   } else {
-    Serial.println(F("OK!"));
+    Serial.println(F(" OK!"));
   }
 delay(150);
- if (! presss.publish(P)) {
-    Serial.println(F("Failed"));
+
+  Serial.print(F("Probíhá odesílání tlaku:"));
+ if (! presss.publish(p0)) {
+    Serial.println(F(" Failed"));
   } else {
-    Serial.println(F("OK!"));
+    Serial.println(F(" OK!"));
   } 
-
 delay(150);
+
+  Serial.print(F("Probíhá odesílání UV intenzity:"));
  if (! UV.publish(uvIntensity)) {
-    Serial.println(F("Failed"));
+    Serial.println(F(" Failed"));
   } else {
-    Serial.println(F("OK!"));
+    Serial.println(F(" OK!"));
   }  
-
 delay(150);
+
+  Serial.print(F("Probíhá odesílání směru větru:"));
  if (! WV.publish(WW)) {
-    Serial.println(F("Failed"));
+    Serial.println(F(" Failed"));
   } else {
-    Serial.println(F("OK!"));
+    Serial.println(F(" OK!"));
   }  
-  // ping the server to keep the mqtt connection alive
-  // NOT required if you are publishing once every KEEPALIVE seconds
-  /*
-  if(! mqtt.ping()) {
-    mqtt.disconnect();
-  }
-  */
+delay(150);
+ 
 rescnt++;
 if (rescnt == 360) {
   ESP.restart();
 } else {
+  
+  Serial.print("Počet provedených měření od restartu: ");
   Serial.println(rescnt);
 }
 delay(10000);
@@ -431,21 +446,21 @@ void MQTT_connect() {
     return;
   }
 
-  Serial.print("Connecting to MQTT... ");
+  Serial.println("Připojuji se k MQTT serveru ");
 
   uint8_t retries = 3;
   while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
        Serial.println(mqtt.connectErrorString(ret));
-       Serial.println("Retrying MQTT connection in 5 seconds...");
+       Serial.println("Nepodařilo se mi připojit k MQTT serveru. Zkusím to znovu za 5 sekund.");
        mqtt.disconnect();
        delay(5000);  // wait 5 seconds
        retries--;
        if (retries == 0) {
-         // basically die and wait for WDT to reset me
-         while (1);
+         // basically die and wait for user to reset me
+         ESP.restart();
        }
   }
-  Serial.println("MQTT Connected!");
+  Serial.println("Úspěšně připojeno!");
 }
 
  int averageAnalogRead( int pinToRead)

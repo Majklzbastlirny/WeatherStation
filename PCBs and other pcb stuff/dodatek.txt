@@ -1,0 +1,6 @@
+1. Součástky jsou doma, strukturní části jsou připraveny na vytisknutí
+2. Na PCB není více věcí z toho důvodu, že prvně dělám kód a následně desku (abych z důvodu případné chyby v kódu nemusel modifikovat desku)
+
+Všechny materiály (desky, kód, zdrojové soubory) jsou dostupné zde: https://github.com/Majklzbastlirny/WeatherStation
+
+Michal Basler E4
