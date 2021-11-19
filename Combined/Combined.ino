@@ -42,7 +42,7 @@ Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/UV");
 Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/WV");
 
 /******************* Globální proměnné, definice a objekty **************************************/
-#define DOBA_HIBERNACE 10 //v minutách
+#define DOBA_HIBERNACE 10 //v sekundách
 
 #define LEDDIAG 2
 int rescnt = 0;
@@ -414,8 +414,9 @@ delay(150);
 delay(150);
  
 rescnt++;
-if (rescnt == 360) {
-  ESP.restart();
+if (rescnt == 10) {
+  //ESP.restart();
+  Hibernace();
 } else {
   
   Serial.print("Počet provedených měření od restartu: ");
@@ -453,6 +454,15 @@ void MQTT_connect() {
   }
   Serial.println("Úspěšně připojeno!");
 }
+
+void Hibernace(){
+  Serial.println("Jdu do režimu hibernace");
+  esp_sleep_enable_timer_wakeup(DOBA_HIBERNACE * 1000000);
+  esp_deep_sleep_start();
+  
+}
+
+
 
  int averageAnalogRead( int pinToRead)
 {
