@@ -63,10 +63,10 @@ bool D2 = 0;
 bool D3 = 0;
 bool D4 = 0;
 bool D5 = 0;
-float WW = 0;
+float wv = 0;
 
 //Proměnné k anemometru
-float ws = 1;
+float ws = 1; //V M/S
 
 //Proměnné k senzoru intenzity UV zařízení
 int UVOUT = 34; 
@@ -220,107 +220,107 @@ char status;
 lux = lightMeter.readLightLevel();
 
 if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 0) {
-  WW = 0;
+  wv = 0;
   }
 else if (D1 == 1 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 0) {
-  WW = 11.25;
+  wv = 11.25;
   }
 else if (D1 == 1 && D2 == 1 && D3 == 0 && D4 == 0 && D5 == 0) {
-  WW = 22.5;
+  wv = 22.5;
   }
 else if (D1 == 0 && D2 == 1 && D3 == 0 && D4 == 0 && D5 == 0) {
-  WW = 33.75;
+  wv = 33.75;
   }
 else if (D1 == 0 && D2 == 1 && D3 == 1 && D4 == 0 && D5 == 0) {
-  WW = 45;
+  wv = 45;
   }
 else if (D1 == 1 && D2 == 1 && D3 == 1 && D4 == 0 && D5 == 0) {
-  WW = 56.25;
+  wv = 56.25;
   }
 else if (D1 == 1 && D2 == 0 && D3 == 1 && D4 == 0 && D5 == 0) {
-  WW = 67.5;
+  wv = 67.5;
   }
 else if (D1 == 0 && D2 == 0 && D3 == 1 && D4 == 0 && D5 == 0) {
-  WW = 78.75;
+  wv = 78.75;
   }
 else if (D1 == 0 && D2 == 0 && D3 == 1 && D4 == 1 && D5 == 0) {
-  WW = 90;
+  wv = 90;
   }
 else if (D1 == 1 && D2 == 0 && D3 == 1 && D4 == 1 && D5 == 0) {
-  WW = 101.25;
+  wv = 101.25;
   }
 else if (D1 == 1 && D2 == 1 && D3 == 1 && D4 == 1 && D5 == 0) {
-  WW = 112.5;
+  wv = 112.5;
   }
 else if (D1 == 0 && D2 == 1 && D3 == 1 && D4 == 1 && D5 == 0) {
-  WW = 123.75;
+  wv = 123.75;
   }
 else if (D1 == 0 && D2 == 1 && D3 == 0 && D4 == 1 && D5 == 0) {
-  WW = 135;
+  wv = 135;
   }
 else if (D1 == 1 && D2 == 1 && D3 == 0 && D4 == 1 && D5 == 0) {
-  WW = 146.25;//not
+  wv = 146.25;//not
   }
 else if (D1 == 1 && D2 == 0 && D3 == 0 && D4 == 1 && D5 == 0) {
-  WW = 157.5;//not
+  wv = 157.5;//not
   }
 else if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 1 && D5 == 0) {//15
-  WW = 168.75;
+  wv = 168.75;
   }
 else if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 1 && D5 == 1) {
-  WW = 180;
+  wv = 180;
   }
 else if (D1 == 1 && D2 == 0 && D3 == 0 && D4 == 1 && D5 == 1) {
-  WW = 191.25;//not
+  wv = 191.25;//not
   }
 else if (D1 == 1 && D2 == 1 && D3 == 0 && D4 == 1 && D5 == 1) {
-  WW = 202.5;//not
+  wv = 202.5;//not
   }
 else if (D1 == 0 && D2 == 1 && D3 == 0 && D4 == 1 && D5 == 1) {
-  WW = 213.75;
+  wv = 213.75;
   }
 else if (D1 == 0 && D2 == 1 && D3 == 1 && D4 == 1 && D5 == 1) {
-  WW = 225;
+  wv = 225;
   }
 else if (D1 == 1 && D2 == 1 && D3 == 1 && D4 == 1 && D5 == 1) {
-  WW = 236.25;//not
+  wv = 236.25;//not
   }
 else if (D1 == 1 && D2 == 0 && D3 == 1 && D4 == 1 && D5 == 1) {
-  WW = 247.5;//not
+  wv = 247.5;//not
   }
 else if (D1 == 0 && D2 == 0 && D3 == 1 && D4 == 1 && D5 == 1) {
-  WW = 258.75;
+  wv = 258.75;
   }
 else if (D1 == 0 && D2 == 0 && D3 == 1 && D4 == 0 && D5 == 1) {
-  WW = 270;
+  wv = 270;
   }
 else if (D1 == 1 && D2 == 0 && D3 == 1 && D4 == 0 && D5 == 1) {
-  WW = 281.25;
+  wv = 281.25;
   }
 else if (D1 == 1 && D2 == 1 && D3 == 1 && D4 == 0 && D5 == 1) {
-  WW = 292.5;
+  wv = 292.5;
   }
 else if (D1 == 0 && D2 == 1 && D3 == 1 && D4 == 0 && D5 == 1) {
-  WW = 303.75;
+  wv = 303.75;
   }
 else if (D1 == 0 && D2 == 1 && D3 == 0 && D4 == 0 && D5 == 1) {
-  WW = 315;
+  wv = 315;
   }
 else if (D1 == 1 && D2 == 1 && D3 == 0 && D4 == 0 && D5 == 1) {
-  WW = 326.25;
+  wv = 326.25;
   }
 else if (D1 == 1 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 1) {
-  WW = 337.5;
+  wv = 337.5;
   }
 else if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 1) {
-  WW = 348.75;
+  wv = 348.75;
   }
 
 else {
-  WW=0;
+  wv=0;
   }
 Sprint("Směr větru je: ");  
-Sprint(WW);
+Sprint(wv);
 Sprint("°   ");
 //Sprintln(D1, D2, D3, D4, D5);
 Sprint(D1);
@@ -418,7 +418,7 @@ delay(150);
 delay(150);
 
   Sprint(F("Probíhá odesílání směru větru:"));
- if (! WV.publish(WW)) {
+ if (! WV.publish(wv)) {
     Sprintln(F(" Failed"));
   } else {
     Sprintln(F(" OK!"));
