@@ -55,7 +55,7 @@ Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "weatherStation/Speed");
 #define DOBA_HIBERNACE 10 //v sekundách
 #define LEDDIAG 2
 int rescnt = 0;
-uint32_t x=0;
+
 
 //Proměnné ke korouhvi
 bool D1 = 0;  
@@ -71,6 +71,7 @@ float ws = 1; //V M/S
 //Proměnné k senzoru intenzity UV zařízení
 int UVOUT = 34; 
 int REF_3V3 = 35; 
+uint32_t x=0;
 
 //Proměnné k senzoru vlhkosti a teploty DHT22
 float hd = 0;
