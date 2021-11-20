@@ -44,12 +44,12 @@ Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "weatherStation/Speed");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 //Seriový výstup zapnut
-//#define Sprintln(a) (Serial.println(a))
-//#define Sprint(a) (Serial.print(a))
+#define Sprintln(a) (Serial.println(a))
+#define Sprint(a) (Serial.print(a))
 
 //Seriový výstup vypnut
-#define Sprintln(a)
-#define Sprint(a)
+//#define Sprintln(a)
+//#define Sprint(a)
 
 
 #define DOBA_HIBERNACE 10 //v sekundách
@@ -66,8 +66,12 @@ bool D5 = 0;
 float wv = 0;
 
 //Proměnné k anemometru
-float ws = 1; //V M/S
+float ws = 0; //V M/S
+#define AnemoPIN  33
 
+float AnemoTime = 10000; //doba měření rychlosti v ms
+byte pulses = 0;
+ 
 //Proměnné k senzoru intenzity UV zařízení
 int UVOUT = 34; 
 int REF_3V3 = 35; 
@@ -101,7 +105,7 @@ pinMode(LEDDIAG, OUTPUT);
 pinMode(UVOUT, INPUT);
 pinMode(REF_3V3, INPUT);
 
-//Nastavení pinů
+//Nastavení pinů směrovky větru
 pinMode(27, INPUT_PULLDOWN);
 pinMode(26, INPUT_PULLDOWN);
 pinMode(25, INPUT_PULLDOWN);
@@ -141,16 +145,9 @@ D1 = digitalRead(27);
   delay(10);
  dht.begin(); 
  delay(250);
-hd = dht.readHumidity();
-  // Read temperature as Celsius (the default)
-td = dht.readTemperature();
 
 
-
-if (isnan(hd) || isnan(td)) {
-    Sprintln(F("Failed to read from DHT sensor!"));
-    return;
-  }
+ 
   lux = lightMeter.readLightLevel();
 
 
@@ -176,8 +173,6 @@ if (isnan(hd) || isnan(td)) {
 void loop() {
   Sprintln("");
   Sprintln("");
-
-  
 digitalWrite(LEDDIAG, LOW);  
  MQTT_connect();
   
@@ -218,7 +213,17 @@ char status;
     }
   }  
   delay(1);
-lux = lightMeter.readLightLevel();
+
+pinMode(AnemoPIN, INPUT);
+attachInterrupt(AnemoPIN, ISR, FALLING);
+delay(AnemoTime);
+
+detachInterrupt(AnemoPIN);
+ws = 2*PI*0.08*(pulses/AnemoTime/2*1000);
+Sprint("Rychlost větru: ");
+Sprint(ws);
+Sprintln(" m/s");
+
 
 if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 0) {
   wv = 0;
@@ -335,20 +340,23 @@ Sprint(" ");
 Sprint(D5);
 Sprintln("");
 
+hd = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+td = dht.readTemperature();
 
 
 
- 
- 
+if (isnan(hd) || isnan(td)) {
+    Sprintln(F("Failed to read from DHT sensor!"));
+    return;
+  }
 
-
-  Sprint(F("Vlhkost: "));
+Sprint(F("Vlhkost: "));
   Sprint(hd);
   Sprintln("%");
   Sprint(F("Teplota DHT22: "));
   Sprint(td);
   Sprintln(F(" °C "));
- 
 
  int uvLevel = averageAnalogRead(UVOUT);
   int refLevel = averageAnalogRead(REF_3V3);
@@ -364,8 +372,6 @@ Sprintln("");
     uvIntensity = uvIntensity;
   }
   
- 
-
   Sprint("UV intenzita (mW/cm^2): ");
   Sprint(uvIntensity);
   Sprintln("");
@@ -479,10 +485,12 @@ void MQTT_connect() {
 void Hibernace(){
   Sprintln("Jdu do režimu hibernace");
   esp_sleep_enable_timer_wakeup(DOBA_HIBERNACE * 1000000);
-  esp_deep_sleep_start();
-  
+  esp_deep_sleep_start(); 
 }
 
+void ISR(){
+    pulses++;
+}
 
 
  int averageAnalogRead( int pinToRead)
