@@ -42,8 +42,16 @@ Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/UV");
 Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/WV");
 
 /******************* Globální proměnné, definice a objekty **************************************/
-#define DOBA_HIBERNACE 10 //v sekundách
+//Seriový výstup zapnut
+//#define Sprintln(a) (Serial.println(a))
+//#define Sprint(a) (Serial.print(a))
 
+//Seriový výstup vypnut
+#define Sprintln(a)
+#define Sprint(a)
+
+
+#define DOBA_HIBERNACE 10 //v sekundách
 #define LEDDIAG 2
 int rescnt = 0;
 uint32_t x=0;
@@ -102,23 +110,23 @@ D2 = digitalRead(26);
 D1 = digitalRead(27);
 
 //Připojení k WiFi
-  Serial.println();
-  Serial.print("Připojuji se k: ");
-  Serial.println(WLAN_SSID);
+  Sprintln();
+  Sprint("Připojuji se k: ");
+  Sprintln(WLAN_SSID);
 
   WiFi.begin(WLAN_SSID, WLAN_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    Sprint(".");
   }
-  Serial.println();
+  Sprintln();
 
-  Serial.println("Uspěšně připojeno");
-  Serial.println("Moje IP adresa: "); Serial.println(WiFi.localIP());
+  Sprintln("Uspěšně připojeno");
+  Sprintln("Moje IP adresa: "); Sprintln(WiFi.localIP());
   long rssi = WiFi.RSSI();
-  Serial.print("Síla WiFi signálu je: ");
-  Serial.print(rssi);
-  Serial.println(" dBm");
+  Sprint("Síla WiFi signálu je: ");
+  Sprint(rssi);
+  Sprintln(" dBm");
 
 
 
@@ -135,7 +143,7 @@ td = dht.readTemperature();
 
 
 if (isnan(hd) || isnan(td)) {
-    Serial.println(F("Failed to read from DHT sensor!"));
+    Sprintln(F("Failed to read from DHT sensor!"));
     return;
   }
   lux = lightMeter.readLightLevel();
@@ -146,10 +154,10 @@ if (isnan(hd) || isnan(td)) {
 
   
  if (pressure.begin()) //If initialization was successful, continue
-    Serial.println("BMP180 init success");
+    Sprintln("BMP180 init success");
   else 
   {
-    Serial.println("BMP180 init fail");
+    Sprintln("BMP180 init fail");
     ESP.restart();
   }
   
@@ -161,8 +169,8 @@ if (isnan(hd) || isnan(td)) {
 
 
 void loop() {
-  Serial.println("");
-  Serial.println("");
+  Sprintln("");
+  Sprintln("");
 
   
 digitalWrite(LEDDIAG, LOW);  
@@ -171,9 +179,9 @@ digitalWrite(LEDDIAG, LOW);
 char status;
   double T, P, p0; //Creating variables for temp, pressure and relative pressure
 
-  Serial.print("Nadmořská výška stanice: ");
-  Serial.print(NadmVys, 0);
-  Serial.println(" m.n.m.");
+  Sprint("Nadmořská výška stanice: ");
+  Sprint(NadmVys);
+  Sprintln(" m.n.m.");
 
   status = pressure.startTemperature();
   if (status != 0) {
@@ -181,9 +189,9 @@ char status;
 
     status = pressure.getTemperature(T);
     if (status != 0) {
-      Serial.print("Teplota: ");
-      Serial.print(T, 1);
-      Serial.println(" °C");
+      Sprint("Teplota: ");
+      Sprint(T);
+      Sprintln(" °C");
 
       status = pressure.startPressure(3);
 
@@ -192,14 +200,14 @@ char status;
 
         status = pressure.getPressure(P, T);
         if (status != 0) {
-          Serial.print("Absolutní tlak: ");
-          Serial.print(P);
-          Serial.println(" hPa");
+          Sprint("Absolutní tlak: ");
+          Sprint(P);
+          Sprintln(" hPa");
 
           p0 = pressure.sealevel(P, NadmVys);
-          Serial.print("Relativní tlak: ");
-          Serial.print(p0);
-          Serial.println(" hPa");
+          Sprint("Relativní tlak: ");
+          Sprint(p0);
+          Sprintln(" hPa");
         }
       }
     }
@@ -307,20 +315,20 @@ else if (D1 == 0 && D2 == 0 && D3 == 0 && D4 == 0 && D5 == 1) {
 else {
   WW=0;
   }
-Serial.print("Směr větru je: ");  
-Serial.print(WW);
-Serial.print("°   ");
-//Serial.println(D1, D2, D3, D4, D5);
-Serial.print(D1);
-Serial.print(" ");
-Serial.print(D2);
-Serial.print(" ");
-Serial.print(D3);
-Serial.print(" ");
-Serial.print(D4);
-Serial.print(" ");
-Serial.print(D5);
-Serial.println("");
+Sprint("Směr větru je: ");  
+Sprint(WW);
+Sprint("°   ");
+//Sprintln(D1, D2, D3, D4, D5);
+Sprint(D1);
+Sprint(" ");
+Sprint(D2);
+Sprint(" ");
+Sprint(D3);
+Sprint(" ");
+Sprint(D4);
+Sprint(" ");
+Sprint(D5);
+Sprintln("");
 
 
 
@@ -329,12 +337,12 @@ Serial.println("");
  
 
 
-  Serial.print(F("Vlhkost: "));
-  Serial.print(hd);
-  Serial.println("%");
-  Serial.print(F("Teplota DHT22: "));
-  Serial.print(td);
-  Serial.println(F(" °C "));
+  Sprint(F("Vlhkost: "));
+  Sprint(hd);
+  Sprintln("%");
+  Sprint(F("Teplota DHT22: "));
+  Sprint(td);
+  Sprintln(F(" °C "));
  
 
  int uvLevel = averageAnalogRead(UVOUT);
@@ -353,10 +361,10 @@ Serial.println("");
   
  
 
-  Serial.print("UV intenzita (mW/cm^2): ");
-  Serial.print(uvIntensity);
-  Serial.println("");
-  Serial.println("");
+  Sprint("UV intenzita (mW/cm^2): ");
+  Sprint(uvIntensity);
+  Sprintln("");
+  Sprintln("");
 
 
   delay(100);  
@@ -364,52 +372,52 @@ Serial.println("");
 
 
 /************** Poslání dat přes MQTT *******************/  
-  Serial.println(F("Probíhá odesílání dat na server"));
-  Serial.print(F("Probíhá odesílání teploty:"));
+  Sprintln(F("Probíhá odesílání dat na server"));
+  Sprint(F("Probíhá odesílání teploty:"));
   if (! temperature.publish(T)) {
-    Serial.println(F(" Failed"));
+    Sprintln(F(" Failed"));
   } else {
-    Serial.println(F(" OK!"));
+    Sprintln(F(" OK!"));
   }
 delay(150); 
 
-  Serial.print(F("Probíhá odesílání vlhkosti:"));
+  Sprint(F("Probíhá odesílání vlhkosti:"));
   if (! humidity.publish(hd)) {
-    Serial.println(F(" Failed"));
+    Sprintln(F(" Failed"));
   } else {
-    Serial.println(F(" OK!"));
+    Sprintln(F(" OK!"));
   }
 delay(150);
 
-  Serial.print(F("Probíhá odesílání světelnosti:"));
+  Sprint(F("Probíhá odesílání světelnosti:"));
 if (! light.publish(lux)) {
-    Serial.println(F(" Failed"));
+    Sprintln(F(" Failed"));
   } else {
-    Serial.println(F(" OK!"));
+    Sprintln(F(" OK!"));
   }
 delay(150);
 
-  Serial.print(F("Probíhá odesílání tlaku:"));
+  Sprint(F("Probíhá odesílání tlaku:"));
  if (! presss.publish(p0)) {
-    Serial.println(F(" Failed"));
+    Sprintln(F(" Failed"));
   } else {
-    Serial.println(F(" OK!"));
+    Sprintln(F(" OK!"));
   } 
 delay(150);
 
-  Serial.print(F("Probíhá odesílání UV intenzity:"));
+  Sprint(F("Probíhá odesílání UV intenzity:"));
  if (! UV.publish(uvIntensity)) {
-    Serial.println(F(" Failed"));
+    Sprintln(F(" Failed"));
   } else {
-    Serial.println(F(" OK!"));
+    Sprintln(F(" OK!"));
   }  
 delay(150);
 
-  Serial.print(F("Probíhá odesílání směru větru:"));
+  Sprint(F("Probíhá odesílání směru větru:"));
  if (! WV.publish(WW)) {
-    Serial.println(F(" Failed"));
+    Sprintln(F(" Failed"));
   } else {
-    Serial.println(F(" OK!"));
+    Sprintln(F(" OK!"));
   }  
 delay(150);
  
@@ -419,8 +427,8 @@ if (rescnt == 10) {
   Hibernace();
 } else {
   
-  Serial.print("Počet provedených měření od restartu: ");
-  Serial.println(rescnt);
+  Sprint("Počet provedených měření od restartu: ");
+  Sprintln(rescnt);
  
 }
 delay(10000);
@@ -438,12 +446,12 @@ void MQTT_connect() {
     return;
   }
 
-  Serial.println("Připojuji se k MQTT serveru ");
+  Sprintln("Připojuji se k MQTT serveru ");
 
   uint8_t retries = 3;
   while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
-       Serial.println(mqtt.connectErrorString(ret));
-       Serial.println("Nepodařilo se mi připojit k MQTT serveru. Zkusím to znovu za 5 sekund.");
+       Sprintln(mqtt.connectErrorString(ret));
+       Sprintln("Nepodařilo se mi připojit k MQTT serveru. Zkusím to znovu za 5 sekund.");
        mqtt.disconnect();
        delay(5000);  // wait 5 seconds
        retries--;
@@ -452,11 +460,11 @@ void MQTT_connect() {
          ESP.restart();
        }
   }
-  Serial.println("Úspěšně připojeno!");
+  Sprintln("Úspěšně připojeno!");
 }
 
 void Hibernace(){
-  Serial.println("Jdu do režimu hibernace");
+  Sprintln("Jdu do režimu hibernace");
   esp_sleep_enable_timer_wakeup(DOBA_HIBERNACE * 1000000);
   esp_deep_sleep_start();
   
