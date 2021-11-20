@@ -6,10 +6,10 @@ double rev=0;
 int rpm;
 int oldtime=0;        
 int time;
-#define anemo 35
-#define debugl 5
+#define anemo 2
+#define debugl 13
 
-void IRAM_ATTR Ext_INT1_ISR()          //interrupt service routine
+void Ext_INT1_ISR()          //interrupt service routine
 {
 rev++;
 //digitalWrite(debugl,HIGH);
@@ -18,7 +18,7 @@ rev++;
 
 void setup()
 {
- Serial.begin(9600);
+ Serial.begin(115200);
 pinMode(anemo, INPUT);
 pinMode(debugl, OUTPUT);
 }
