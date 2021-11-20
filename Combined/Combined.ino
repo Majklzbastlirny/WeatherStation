@@ -40,6 +40,7 @@ Adafruit_MQTT_Publish light = Adafruit_MQTT_Publish(&mqtt, "weatherStation/light
 Adafruit_MQTT_Publish presss = Adafruit_MQTT_Publish(&mqtt, "weatherStation/pressure");
 Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/UV");
 Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/WV");
+Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "weatherStation/Speed");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 //Seriový výstup zapnut
@@ -63,6 +64,9 @@ bool D3 = 0;
 bool D4 = 0;
 bool D5 = 0;
 float WW = 0;
+
+//Proměnné k anemometru
+float WS = 1;
 
 //Proměnné k senzoru intenzity UV zařízení
 int UVOUT = 34; 
@@ -415,6 +419,14 @@ delay(150);
 
   Sprint(F("Probíhá odesílání směru větru:"));
  if (! WV.publish(WW)) {
+    Sprintln(F(" Failed"));
+  } else {
+    Sprintln(F(" OK!"));
+  }  
+delay(150);
+
+Sprint(F("Probíhá odesílání rychlosti větru:"));
+ if (! WS.publish(WS)) {
     Sprintln(F(" Failed"));
   } else {
     Sprintln(F(" OK!"));
