@@ -66,7 +66,7 @@ bool D5 = 0;
 float WW = 0;
 
 //Proměnné k anemometru
-float WS = 1;
+float ws = 1;
 
 //Proměnné k senzoru intenzity UV zařízení
 int UVOUT = 34; 
@@ -426,7 +426,7 @@ delay(150);
 delay(150);
 
 Sprint(F("Probíhá odesílání rychlosti větru:"));
- if (! WS.publish(WS)) {
+ if (! WS.publish(ws)) {
     Sprintln(F(" Failed"));
   } else {
     Sprintln(F(" OK!"));
