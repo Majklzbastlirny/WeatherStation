@@ -44,12 +44,12 @@ Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "weatherStation/Speed");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 //Seriový výstup zapnut
-#define Sprintln(a) (Serial.println(a))
-#define Sprint(a) (Serial.print(a))
+//#define Sprintln(a) (Serial.println(a))
+//#define Sprint(a) (Serial.print(a))
 
 //Seriový výstup vypnut
-//#define Sprintln(a)
-//#define Sprint(a)
+#define Sprintln(a)
+#define Sprint(a)
 
 
 #define DOBA_HIBERNACE 10 //v sekundách
