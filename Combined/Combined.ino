@@ -92,6 +92,14 @@ BH1750 lightMeter;
 SFE_BMP180 pressure;
 #define NadmVys 333
 
+//Proměnné k vyhřívacímu systému
+RTC_DATA_ATTR bool HeatOn = 0;
+int MinTemp = 3;
+#define HeatPin 4
+
+//Proměnné k odpojovači senzorů
+#define SensorPWR 5
+int wificount = 0;
 /*************************** Vlastní kód ************************************/
 
 
@@ -100,7 +108,8 @@ void setup() {
 Serial.begin(115200);
 /******** Nastavení pinů ***********/
 pinMode(LEDDIAG, OUTPUT);  
-
+pinMode(SensorPWR, OUTPUT);
+digitalWrite(SensorPWR, HIGH);
 //Nastavení pinů pro UV senzor
 pinMode(UVOUT, INPUT);
 pinMode(REF_3V3, INPUT);
@@ -127,6 +136,14 @@ D1 = digitalRead(27);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Sprint(".");
+    wificount++;
+    if (wificount = 10){
+      digitalWrite(SensorPWR, LOW);
+      ESP.restart();
+      }
+    else {}
+
+    
   }
   Sprintln();
 
@@ -159,18 +176,20 @@ D1 = digitalRead(27);
     Sprintln("BMP180 init success");
   else 
   {
-    Sprintln("BMP180 init fail");
+    Sprintln("BMP180 init fail");    
+    digitalWrite(SensorPWR, LOW);
     ESP.restart();
   }
   
 
   
-  // Setup MQTT subscription for onoff feed.
+ 
   
 }
 
 
 void loop() {
+digitalWrite(SensorPWR, HIGH);  
   Sprintln("");
   Sprintln("");
 digitalWrite(LEDDIAG, LOW);  
@@ -213,6 +232,10 @@ char status;
     }
   }  
   delay(1);
+
+if (T < MinTemp) {HeatOn = 1;}
+else if (T >= MinTemp) {HeatOn = 0;}
+else {}
 
 pinMode(AnemoPIN, INPUT);
 attachInterrupt(AnemoPIN, ISR, FALLING);
@@ -316,7 +339,7 @@ Sprint(F("Vlhkost: "));
   delay(100);  
 
 
-
+digitalWrite(SensorPWR, LOW);
 /************** Poslání dat přes MQTT *******************/  
   Sprintln(F("Probíhá odesílání dat na server"));
   Sprint(F("Probíhá odesílání teploty:"));
@@ -376,7 +399,7 @@ Sprint(F("Probíhá odesílání rychlosti větru:"));
 delay(150);
  
 rescnt++;
-if (rescnt == 10) {
+if (rescnt == 6) {
   //ESP.restart();
   Hibernace();
 } else {
