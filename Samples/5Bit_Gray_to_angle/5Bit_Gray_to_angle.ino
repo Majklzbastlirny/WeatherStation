@@ -13,7 +13,7 @@ pinMode(3, INPUT);
 pinMode(4, INPUT);
 pinMode(5, INPUT);
 pinMode(6, INPUT);
-Serial.begin(9600);
+Serial.begin(115200);
 }
 void loop() {
   // put your main code here, to run repeatedly:
@@ -22,7 +22,7 @@ bool D2 = 0;
 bool D3 = 0;
 bool D4 = 0;
 bool D5 = 0;
-float WW = 0;
+float wv = 0;
 
 D5 = digitalRead(6);
 D4 = digitalRead(5);
@@ -65,7 +65,7 @@ else if (D1 ==  1 && D2 == 0  && D3 == 0 && D4 == 1 && D5 == 0 ) { wv = 348; }
 else {
   wv=0;
   }
-Serial.print(WW);
+Serial.print(wv);
 Serial.print("   ");
 //Serial.println(D1, D2, D3, D4, D5);
 Serial.print(D1);
