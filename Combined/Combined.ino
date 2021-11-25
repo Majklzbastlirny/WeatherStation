@@ -44,12 +44,12 @@ Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "weatherStation/Speed");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 //Seriový výstup zapnut
-//#define Sprintln(a) (Serial.println(a))
-//#define Sprint(a) (Serial.print(a))
+#define Sprintln(a) (Serial.println(a))
+#define Sprint(a) (Serial.print(a))
 
 //Seriový výstup vypnut
-#define Sprintln(a)
-#define Sprint(a)
+//#define Sprintln(a)
+//#define Sprint(a)
 
 
 #define DOBA_HIBERNACE 10 //v sekundách
@@ -95,10 +95,10 @@ SFE_BMP180 pressure;
 //Proměnné k vyhřívacímu systému
 RTC_DATA_ATTR bool HeatOn = 0;
 int MinTemp = 3;
-#define HeatPin 4
+#define HeatPin 23
 
 //Proměnné k odpojovači senzorů
-#define SensorPWR 5
+#define SensorPWR 39
 int wificount = 0;
 /*************************** Vlastní kód ************************************/
 
@@ -109,6 +109,7 @@ Serial.begin(115200);
 /******** Nastavení pinů ***********/
 pinMode(LEDDIAG, OUTPUT);  
 pinMode(SensorPWR, OUTPUT);
+delay(25);
 digitalWrite(SensorPWR, HIGH);
 //Nastavení pinů pro UV senzor
 pinMode(UVOUT, INPUT);
@@ -122,10 +123,10 @@ pinMode(14, INPUT_PULLDOWN);
 pinMode(12, INPUT_PULLDOWN);
 
 D5 = digitalRead(12);
-D4 = digitalRead(13);
-D3 = digitalRead(25);
+D4 = digitalRead(14);
+D3 = digitalRead(27);
 D2 = digitalRead(26);
-D1 = digitalRead(27);
+D1 = digitalRead(25);
 
 //Připojení k WiFi
   Sprintln();
@@ -137,12 +138,12 @@ D1 = digitalRead(27);
     delay(500);
     Sprint(".");
     wificount++;
-    if (wificount = 10){
+/*    if (wificount = 10){
       digitalWrite(SensorPWR, LOW);
       ESP.restart();
       }
     else {}
-
+*/
     
   }
   Sprintln();
