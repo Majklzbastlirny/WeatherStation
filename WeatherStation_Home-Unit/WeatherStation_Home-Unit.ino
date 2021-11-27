@@ -164,44 +164,55 @@ display.print(".");
 display.setCursor(80, 0);
   display.println(timeClient.getFormattedTime());
   display.drawLine(0, 8, display.width(), 8, SH110X_WHITE);
-  display.setCursor(0, 10);
-  display.print("Teplota doma: ");
- // display.setTextColor(SH110X_BLACK, SH110X_WHITE); // 'inverted' text
-  display.print(bme.readTemperature());
-  display.drawCircle(119, 11, 1, SH110X_WHITE);
-  display.setCursor(122, 10);
-  display.setTextColor(SH110X_WHITE);
-  display.println("C");
-
+ display.setCursor(0, 10);
 display.setTextColor(SH110X_WHITE);
  display.print("Teplota venku: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)temperature.lastread);
-  display.setCursor(122, 18);
-  display.drawCircle(119, 19, 1, SH110X_WHITE);
+  display.setCursor(122, 10);
+  display.drawCircle(119, 11, 1, SH110X_WHITE);
   display.println("C");
+  display.setCursor(0, 19);
  display.print("Vlhkost venku: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)humidity.lastread);
-  display.setCursor(122, 26);
+  display.setCursor(122, 19);
   display.println("%");
- display.print("Tlak: ");
+  display.setCursor(0, 28);
+ display.print("Tlak venku: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)presss.lastread);
-  display.setCursor(104, 34);
+  display.setCursor(104, 28);
   display.println(" hPa");
+  display.setCursor(0, 37);
  display.print("Svetlo je: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)light.lastread);
 
-  display.setCursor(104, 42);
+  display.setCursor(104, 37);
   display.println(" lux");
+  display.setCursor(0, 47);
  display.print("UV je: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)UV.lastread);
-  display.setCursor(86, 50);
+  display.setCursor(86, 47);
   display.println(" mW/mm2");
-  display.drawLine(0, 63, display.width(), 63, SH110X_WHITE);
+
+display.setCursor(0, 57);
+display.print("Vitr: ");
+display.drawCircle(126, 57, 1, SH110X_WHITE);
+  display.setTextColor(SH110X_WHITE); // 'inverted' text
+  display.print((char *)WS.lastread);
+  //display.setCursor(100, 18);
+  display.print(" m/s  ");
+  display.println((char *)WV.lastread);
+  //display.setCursor(100, 26);
+
+
+
+
+  
+ // display.drawLine(0, 63, display.width(), 63, SH110X_WHITE);
   
   display.display();
 // Adafruit_MQTT_Subscribe *subscription;
@@ -239,17 +250,28 @@ display.setCursor(80, 0);
   display.drawLine(0, 63, display.width(), 63, SH110X_WHITE);
   display.setCursor(0, 10);
 
-display.print("Vitr: ");
-display.drawCircle(126, 11, 1, SH110X_WHITE);
-  display.setTextColor(SH110X_WHITE); // 'inverted' text
-  display.print((char *)WS.lastread);
-  //display.setCursor(100, 18);
-  display.print(" m/s  ");
- 
- 
-  display.println((char *)WV.lastread);
-  //display.setCursor(100, 26);
+
   
+ display.setCursor(0, 10);
+  display.print("Teplota doma: ");
+ // display.setTextColor(SH110X_BLACK, SH110X_WHITE); // 'inverted' text
+  display.print(bme.readTemperature());
+  display.drawCircle(119, 11, 1, SH110X_WHITE);
+  display.setCursor(122, 10);
+  display.setTextColor(SH110X_WHITE);
+  display.println("C");
+  display.setCursor(0, 19);
+display.print("Vlhkost doma: ");
+  
+  display.print((char *)humidity.lastread);
+  display.setCursor(122, 19);
+  display.println("%");
+  
+  display.setCursor(0, 28);
+  display.print("Tlak doma: ");
+  display.print(((bme.readPressure())/pow((1-((float)(333))/44330), 5.255))/100.0);
+  display.setCursor(104, 28);
+  display.println(" hPa");
 
 
 
