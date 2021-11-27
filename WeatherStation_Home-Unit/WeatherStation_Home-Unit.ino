@@ -73,7 +73,7 @@ void setup()   {
   mqtt.subscribe(&WV);
   mqtt.subscribe(&WS);
  
-
+Adafruit_MQTT_Subscribe *subscription;
 WiFi.begin(ssid, password);
 
   while ( WiFi.status() != WL_CONNECTED ) {
@@ -99,37 +99,15 @@ Serial.println(bme.readTemperature());
 
 
 void loop() {
+  
+
 MQTT_connect();
+
  timeClient.update();
 
 
- Adafruit_MQTT_Subscribe *subscription;
-  while ((subscription = mqtt.readSubscription(5))) {
-    if (subscription == &temperature) {
-      Serial.print(F("Got: "));
-      Serial.println((char *)temperature.lastread);
-    }
-    else if (subscription == &humidity) {
-      Serial.print(F("Got: "));
-      Serial.println((char *)humidity.lastread);
-    }
-    else if (subscription == &presss) {
-      Serial.print(F("Got: "));
-      Serial.println((char *)presss.lastread);
-    }
-    else if (subscription == &light) {
-      Serial.print(F("Got: "));
-      Serial.println((char *)light.lastread);
-    }
-    else if (subscription == &UV) {
-      Serial.print(F("Got: "));
-      Serial.println((char *)UV.lastread);
-    }
-
-
-
-    
-  }
+ 
+  Get_Data();
 
 
 
@@ -177,51 +155,135 @@ display.setTextSize(1);
   display.print(daysOfTheWeek[timeClient.getDay()]);
  // display.print("Ctvrtek");
 display.setCursor(43, 0);
+display.setTextColor(SH110X_BLACK, SH110X_WHITE);
 display.print(monthDay);
 display.print(".");
 display.print(currentMonth);
 display.print(".");
+ display.setTextColor(SH110X_WHITE);
 display.setCursor(80, 0);
   display.println(timeClient.getFormattedTime());
   display.drawLine(0, 8, display.width(), 8, SH110X_WHITE);
   display.setCursor(0, 10);
-  display.print("Teplota je: ");
-  display.setTextColor(SH110X_BLACK, SH110X_WHITE); // 'inverted' text
+  display.print("Teplota doma: ");
+ // display.setTextColor(SH110X_BLACK, SH110X_WHITE); // 'inverted' text
   display.print(bme.readTemperature());
-  display.println(" C");
+  display.drawCircle(119, 11, 1, SH110X_WHITE);
+  display.setCursor(122, 10);
+  display.setTextColor(SH110X_WHITE);
+  display.println("C");
 
 display.setTextColor(SH110X_WHITE);
- display.print("Teplota je: ");
+ display.print("Teplota venku: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)temperature.lastread);
-  display.println(" C");
- display.print("Vlhkost je: ");
+  display.setCursor(122, 18);
+  display.drawCircle(119, 19, 1, SH110X_WHITE);
+  display.println("C");
+ display.print("Vlhkost venku: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)humidity.lastread);
-  display.println(" %");
- display.print("Tlak je: ");
+  display.setCursor(122, 26);
+  display.println("%");
+ display.print("Tlak: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)presss.lastread);
+  display.setCursor(104, 34);
   display.println(" hPa");
  display.print("Svetlo je: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)light.lastread);
+
+  display.setCursor(104, 42);
   display.println(" lux");
  display.print("UV je: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)UV.lastread);
+  display.setCursor(86, 50);
   display.println(" mW/mm2");
   display.drawLine(0, 63, display.width(), 63, SH110X_WHITE);
   
   display.display();
+// Adafruit_MQTT_Subscribe *subscription;
+  Get_Data();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+display.clearDisplay();
+display.setCursor(0, 0);
+  display.print(daysOfTheWeek[timeClient.getDay()]);
+ // display.print("Ctvrtek");
+display.setCursor(43, 0);
+display.setTextColor(SH110X_BLACK, SH110X_WHITE);
+display.print(monthDay);
+display.print(".");
+display.print(currentMonth);
+display.print(".");
+ display.setTextColor(SH110X_WHITE);
+display.setCursor(80, 0);
+  display.println(timeClient.getFormattedTime());
+  display.drawLine(0, 8, display.width(), 8, SH110X_WHITE);
+  display.drawLine(0, 63, display.width(), 63, SH110X_WHITE);
+  display.setCursor(0, 10);
+
+display.print("Vitr: ");
+display.drawCircle(126, 11, 1, SH110X_WHITE);
+  display.setTextColor(SH110X_WHITE); // 'inverted' text
+  display.print((char *)WS.lastread);
+  //display.setCursor(100, 18);
+  display.print(" m/s  ");
+ 
+ 
+  display.println((char *)WV.lastread);
+  //display.setCursor(100, 26);
+  
+
+
+
+  
+  display.display();
+Get_Data();
+
+
+
+
+
+
+
+
+
+  
     if(! mqtt.ping()) {
     mqtt.disconnect();
   }
-  delay(500);
+//   Adafruit_MQTT_Subscribe *subscription;
+  
+
+
+
+
+
+
+
+
+
+
 
 
 }
-
 
 void MQTT_connect() {
   int8_t ret;
@@ -246,4 +308,43 @@ void MQTT_connect() {
        }
   }
   Serial.println("MQTT Connected!");
+  
+}
+
+
+
+
+
+void Get_Data() {
+  Adafruit_MQTT_Subscribe *subscription;
+  while ((subscription = mqtt.readSubscription(5000))) {
+    if (subscription == &temperature) {
+      Serial.print(F("Got: "));
+      Serial.println((char *)temperature.lastread);
+    }
+    else if (subscription == &humidity) {
+      Serial.print(F("Got: "));
+      Serial.println((char *)humidity.lastread);
+    }
+    else if (subscription == &presss) {
+      Serial.print(F("Got: "));
+      Serial.println((char *)presss.lastread);
+    }
+    else if (subscription == &light) {
+      Serial.print(F("Got: "));
+      Serial.println((char *)light.lastread);
+    }
+    else if (subscription == &UV) {
+      Serial.print(F("Got: "));
+      Serial.println((char *)UV.lastread);
+    }
+   else if (subscription == &WV) {
+      Serial.print(F("Got: "));
+      Serial.println((char *)WV.lastread);
+    }
+     else if (subscription == &WS) {
+      Serial.print(F("Got: "));
+      Serial.println((char *)WS.lastread);
+    }
+}
 }
