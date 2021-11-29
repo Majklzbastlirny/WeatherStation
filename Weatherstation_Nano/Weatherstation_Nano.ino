@@ -21,8 +21,8 @@ const int intervall = 60000;  //milliseconds to sleep
 const int timeout = 200;  //time out loop count
 
 // ---------- WLAN ------------ //
-#define WLAN_SSID   "Edma"
-#define WLAN_PASS   "pes_Fido"
+#define WLAN_SSID   "SSID"
+#define WLAN_PASS   "password"
 
 WiFiClient client;
 Adafruit_MQTT_Client mqtt(&client, HOST, PORT, USERNAME, PASSWORD);
