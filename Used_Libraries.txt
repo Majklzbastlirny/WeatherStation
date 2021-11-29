@@ -1,7 +1,17 @@
-ML8511 UV sensor - https://github.com/RobTillaart/ML8511
-DHT11/22 Temperature & Humidity - https://github.com/adafruit/DHT-sensor-library
-BH1750 Light intensity - https://github.com/claws/BH1750
-BMP180 Temperature & Pressure - https://github.com/LowPowerLab/SFE_BMP180
+DHT11/22 Temperature & Humidity (DHT.h) - https://github.com/adafruit/DHT-sensor-library
+BH1750 Light intensity (BH1750.h) - https://github.com/claws/BH1750
+BMP180 Temperature & Pressure (SFE_BMP180.h) - https://github.com/LowPowerLab/SFE_BMP180
 I2C Bus (Wire.h) - Integrated by default in Arduino IDE
-MQTT Client and Publisher - https://github.com/adafruit/Adafruit_MQTT_Library
-WiFi library (WiFi.h) - Integrated by default in Arduino ID
+MQTT Client and Publisher (Adafruit_MQTT.h, Adafruit_MQTT_Client.h) - https://github.com/adafruit/Adafruit_MQTT_Library
+WiFi library (WiFi.h) - Integrated by default in Arduino IDE
+WiFi library for ESP8266 (ESP8266WiFi.h) - Integrated by default in Arduino IDE
+WiFi library for UDP support (WiFiUdp.h) - Integrated by default in Arduino IDE
+Oled display library (Adafruit_SH110X.h) - https://github.com/adafruit/Adafruit_SH110x
+Additional library for oled display (Adafruit_GFX.h) - https://github.com/adafruit/Adafruit_GFX-Library
+Library for BMP280 module (Adafruit_BMP280.h) - https://github.com/adafruit/Adafruit_BMP280_Library
+Library for BME280 module (Adafruit_BME280.h) - https://github.com/adafruit/Adafruit_BME280_Library
+Generic library for sensors (Adafruit_Sensor.h) - https://github.com/adafruit/Adafruit_Sensor
+
+
+No longer needed:
+ML8511 UV sensor (ML8511.h) - https://github.com/RobTillaart/ML8511
