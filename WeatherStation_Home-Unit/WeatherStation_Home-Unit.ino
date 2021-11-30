@@ -175,12 +175,14 @@ display.setTextColor(SH110X_WHITE);
   display.setCursor(0, 19);
  display.print("Vlhkost venku: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
+  display.setCursor(84, 19);
   display.print((char *)humidity.lastread);
   display.setCursor(122, 19);
   display.println("%");
   display.setCursor(0, 28);
  display.print("Tlak venku: ");
   display.setTextColor(SH110X_WHITE); // 'inverted' text
+  display.setCursor(66, 28);
   display.print((char *)presss.lastread);
   display.setCursor(104, 28);
   display.println(" hPa");
