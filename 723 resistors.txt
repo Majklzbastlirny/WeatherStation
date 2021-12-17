@@ -1,0 +1,5 @@
+R1 propoj
+Rp 470
+R2 6k8
+R3 470
+Rb 330m

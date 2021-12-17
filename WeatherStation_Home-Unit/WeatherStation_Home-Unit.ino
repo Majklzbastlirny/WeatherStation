@@ -281,6 +281,7 @@ display.print("Vlhkost doma: ");
   display.display();
 Get_Data();
 
+//display.clear();
 
 
 

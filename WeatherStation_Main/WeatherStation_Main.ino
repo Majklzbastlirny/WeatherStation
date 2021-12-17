@@ -15,9 +15,12 @@ https://youtu.be/LY-1DHTxRAk?t=355
 #include <SFE_BMP180.h>
 
 /************************* WiFi Access Point *********************************/
-
+/*
 #define WLAN_SSID         "MediumRecords"
 #define WLAN_PASS         "123456780"
+*/
+#define WLAN_SSID         "Exhoost_foome"
+#define WLAN_PASS         "bottomgear"
 
 /************************* MQTT Broker Setup *********************************/
 
