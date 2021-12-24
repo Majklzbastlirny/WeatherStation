@@ -15,12 +15,10 @@ https://youtu.be/LY-1DHTxRAk?t=355
 #include <SFE_BMP180.h>
 
 /************************* WiFi Access Point *********************************/
-/*
+
 #define WLAN_SSID         "MediumRecords"
 #define WLAN_PASS         "123456780"
-*/
-#define WLAN_SSID         "Exhoost_foome"
-#define WLAN_PASS         "bottomgear"
+
 
 /************************* MQTT Broker Setup *********************************/
 
@@ -47,12 +45,12 @@ Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "weatherStation/Speed");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 //Seriový výstup zapnut
-//#define Sprintln(a) (Serial.println(a))
-//#define Sprint(a) (Serial.print(a))
+#define Sprintln(a) (Serial.println(a))
+#define Sprint(a) (Serial.print(a))
 
 //Seriový výstup vypnut
-#define Sprintln(a)
-#define Sprint(a)
+//#define Sprintln(a)
+//#define Sprint(a)
 
 
 #define DOBA_HIBERNACE 10 //v sekundách
@@ -98,17 +96,17 @@ SFE_BMP180 pressure;
 //Proměnné k vyhřívacímu systému
 RTC_DATA_ATTR bool HeatOn = 0;
 int MinTemp = 3;
-#define HeatPin 23
+#define HeatPin 4
 
 //Proměnné k odpojovači senzorů
-#define SensorPWR 39
+#define SensorPWR 25
 int wificount = 0;
 /*************************** Vlastní kód ************************************/
 
 
 
 void setup() {
-//Serial.begin(115200);
+Serial.begin(115200);
 /******** Nastavení pinů ***********/
 pinMode(LEDDIAG, OUTPUT);  
 pinMode(SensorPWR, OUTPUT);
