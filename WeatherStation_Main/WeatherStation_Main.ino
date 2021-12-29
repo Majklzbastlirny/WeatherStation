@@ -12,7 +12,7 @@ https://youtu.be/LY-1DHTxRAk?t=355
 #include <BH1750.h>
 #include <Wire.h>
 #include "DHT.h"
-#include <SFE_BMP180.h>
+#include <Adafruit_BMP280.h>
 
 /************************* WiFi Access Point *********************************/
 
@@ -35,13 +35,15 @@ Adafruit_MQTT_Client mqtt(&client, MQTT_BROKER_IP, MQTT_BROKER_PORT, MQTT_USERNA
 
 /************************* MQTT Topics ***************************************/
 
-Adafruit_MQTT_Publish temperature = Adafruit_MQTT_Publish(&mqtt, "weatherStation/temperature");
-Adafruit_MQTT_Publish humidity = Adafruit_MQTT_Publish(&mqtt, "weatherStation/humidity");
-Adafruit_MQTT_Publish light = Adafruit_MQTT_Publish(&mqtt, "weatherStation/light");
-Adafruit_MQTT_Publish presss = Adafruit_MQTT_Publish(&mqtt, "weatherStation/pressure");
-Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/UV");
-Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "weatherStation/WV");
-Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "weatherStation/Speed");
+Adafruit_MQTT_Publish temperature = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Temperature");
+Adafruit_MQTT_Publish temperature2 = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Temperature2");
+Adafruit_MQTT_Publish humidity = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Humidity");
+Adafruit_MQTT_Publish light = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Light");
+Adafruit_MQTT_Publish presss = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Pressure");
+Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/UV");
+Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/WV");
+Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Speed");
+Adafruit_MQTT_Publish BatVoltage = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Voltage");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 //Seriový výstup zapnut
@@ -68,20 +70,20 @@ float wv = 0;
 
 //Proměnné k anemometru
 float ws = 0; //V M/S
-#define AnemoPIN  33
+#define AnemoPIN  35
 
 float AnemoTime = 10000; //doba měření rychlosti v ms
 byte pulses = 0;
  
 //Proměnné k senzoru intenzity UV zařízení
-int UVOUT = 34; 
-int REF_3V3 = 35; 
+int UVOUT = 33; 
+int REF_3V3 = 34; 
 uint32_t x=0;
 
 //Proměnné k senzoru vlhkosti a teploty DHT22
 float hd = 0;
 float td = 0;
-#define DHTPIN 4  
+#define DHTPIN 4 
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE); 
 
@@ -90,13 +92,17 @@ float lux = 0;
 BH1750 lightMeter;
 
 //Proměnné k senzoru teploty a tlaku BMP180
-SFE_BMP180 pressure;
+Adafruit_BMP280 bmp;
 #define NadmVys 333
 
 //Proměnné k vyhřívacímu systému
 RTC_DATA_ATTR bool HeatOn = 0;
 int MinTemp = 3;
 #define HeatPin 4
+
+//Proměnné k senzoru napětí
+#define voltmeas 32
+float voltage = 0;
 
 //Proměnné k odpojovači senzorů
 #define SensorPWR 25
@@ -106,6 +112,8 @@ int wificount = 0;
 
 
 void setup() {
+Wire.begin();
+Wire.setClock(10000);
 Serial.begin(115200);
 /******** Nastavení pinů ***********/
 pinMode(LEDDIAG, OUTPUT);  
@@ -117,17 +125,13 @@ pinMode(UVOUT, INPUT);
 pinMode(REF_3V3, INPUT);
 
 //Nastavení pinů směrovky větru
-pinMode(27, INPUT_PULLDOWN);
-pinMode(26, INPUT_PULLDOWN);
-pinMode(25, INPUT_PULLDOWN);
-pinMode(14, INPUT_PULLDOWN);
-pinMode(12, INPUT_PULLDOWN);
+pinMode(19, INPUT_PULLDOWN);
+pinMode(18, INPUT_PULLDOWN);
+pinMode(5, INPUT_PULLDOWN);
+pinMode(17, INPUT_PULLDOWN);
+pinMode(16, INPUT_PULLDOWN);
 
-D5 = digitalRead(12);
-D4 = digitalRead(14);
-D3 = digitalRead(27);
-D2 = digitalRead(26);
-D1 = digitalRead(25);
+
 
 //Připojení k WiFi
   Sprintln();
@@ -159,7 +163,8 @@ D1 = digitalRead(25);
 
 
 
-  
+  unsigned status;
+  status = bmp.begin(0x76, 0x58);
   lightMeter.begin();
   delay(10);
  dht.begin(); 
@@ -167,21 +172,13 @@ D1 = digitalRead(25);
 
 
  
-  lux = lightMeter.readLightLevel();
-
-
-
-
-
   
- if (pressure.begin()) //If initialization was successful, continue
-    Sprintln("BMP180 init success");
-  else 
-  {
-    Sprintln("BMP180 init fail");    
-    digitalWrite(SensorPWR, LOW);
-    ESP.restart();
-  }
+
+
+
+
+
+
   
 
   
@@ -196,7 +193,20 @@ digitalWrite(SensorPWR, HIGH);
   Sprintln("");
 digitalWrite(LEDDIAG, LOW);  
  MQTT_connect();
-  
+
+
+D5 = digitalRead(19);
+D4 = digitalRead(18);
+D3 = digitalRead(5);
+D2 = digitalRead(17);
+D1 = digitalRead(16);
+
+voltage = (((analogRead(voltmeas)*8.158)/4095)+0.13);
+ Sprint("Napětí na baterce: ");
+ Sprint(voltage);
+ Sprintln(" V");
+delay(10);
+lux = lightMeter.readLightLevel();
 char status;
   double T, P, p0; //Creating variables for temp, pressure and relative pressure
 
@@ -204,14 +214,32 @@ char status;
   Sprint(NadmVys);
   Sprintln(" m.n.m.");
 
-  status = pressure.startTemperature();
+
+Sprint(F("Teplota: "));
+    T = bmp.readTemperature();
+    Sprint(T);
+    Sprintln(" *C");
+
+    Sprint(F("Absolutní tlak: "));
+    P = (bmp.readPressure()/100);
+    Sprint(P);
+    Sprintln(" hPa");
+
+    Sprint(F("Relativní tlak: "));
+    p0 = (((bmp.readPressure())/pow((1-((float)(NadmVys))/44330), 5.255))/100.0);
+    Sprint(p0);
+    Sprintln(" hPa");
+
+    
+
+/*  status = pressure.startTemperature();
   if (status != 0) {
     delay(status);
 
     status = pressure.getTemperature(T);
     if (status != 0) {
       Sprint("Teplota: ");
-      Sprint(T);
+      Sprint(bmp.readTemperature());
       Sprintln(" °C");
 
       status = pressure.startPressure(3);
@@ -233,6 +261,8 @@ char status;
       }
     }
   }  
+
+  */
   delay(1);
 
 if (T < MinTemp) {HeatOn = 1;}
@@ -289,21 +319,20 @@ Sprint("Směr větru je: ");
 Sprint(wv);
 Sprint("°   ");
 //Sprintln(D1, D2, D3, D4, D5);
-Sprint(D1);
-Sprint(" ");
-Sprint(D2);
-Sprint(" ");
-Sprint(D3);
+Sprint(D5);
 Sprint(" ");
 Sprint(D4);
 Sprint(" ");
-Sprint(D5);
+Sprint(D3);
+Sprint(" ");
+Sprint(D2);
+Sprint(" ");
+Sprint(D1);
 Sprintln("");
 
 hd = dht.readHumidity();
-  // Read temperature as Celsius (the default)
+  
 td = dht.readTemperature();
-
 
 
 if (isnan(hd) || isnan(td)) {
@@ -346,6 +375,14 @@ digitalWrite(SensorPWR, LOW);
   Sprintln(F("Probíhá odesílání dat na server"));
   Sprint(F("Probíhá odesílání teploty:"));
   if (! temperature.publish(T)) {
+    Sprintln(F(" Failed"));
+  } else {
+    Sprintln(F(" OK!"));
+  }
+delay(150); 
+
+ Sprint(F("Probíhá odesílání teploty (záloha):"));
+  if (! temperature2.publish(td)) {
     Sprintln(F(" Failed"));
   } else {
     Sprintln(F(" OK!"));
@@ -397,7 +434,15 @@ Sprint(F("Probíhá odesílání rychlosti větru:"));
     Sprintln(F(" Failed"));
   } else {
     Sprintln(F(" OK!"));
-  }  
+  }
+delay(150);
+ 
+Sprint(F("Probíhá odesílání napětí baterie:"));
+ if (! BatVoltage.publish(voltage)) {
+    Sprintln(F(" Failed"));
+  } else {
+    Sprintln(F(" OK!"));
+  }    
 delay(150);
  
 rescnt++;
