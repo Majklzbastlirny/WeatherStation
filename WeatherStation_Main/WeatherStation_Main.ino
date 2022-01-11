@@ -16,8 +16,8 @@ https://youtu.be/LY-1DHTxRAk?t=355
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID         "MediumRecords"
-#define WLAN_PASS         "123456780"
+#define WLAN_SSID         "Edma_UBNT"
+#define WLAN_PASS         "pes_Fido"
 
 
 /************************* MQTT Broker Setup *********************************/
@@ -56,6 +56,7 @@ Adafruit_MQTT_Publish BatVoltage = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/
 
 
 #define DOBA_HIBERNACE 10 //v sekundách
+#define mezera 10000 //mezera mezi měřením (v ms)
 #define LEDDIAG 2
 int rescnt = 0;
 
@@ -72,7 +73,7 @@ float wv = 0;
 float ws = 0; //V M/S
 #define AnemoPIN  35
 
-float AnemoTime = 10000; //doba měření rychlosti v ms
+float AnemoTime = 1000; //doba měření rychlosti v ms
 byte pulses = 0;
  
 //Proměnné k senzoru intenzity UV zařízení
@@ -83,7 +84,7 @@ uint32_t x=0;
 //Proměnné k senzoru vlhkosti a teploty DHT22
 float hd = 0;
 float td = 0;
-#define DHTPIN 4 
+#define DHTPIN 23 //4
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE); 
 
@@ -113,7 +114,7 @@ int wificount = 0;
 
 void setup() {
 Wire.begin();
-Wire.setClock(10000);
+Wire.setClock(7500);
 Serial.begin(115200);
 /******** Nastavení pinů ***********/
 pinMode(LEDDIAG, OUTPUT);  
@@ -131,8 +132,8 @@ pinMode(5, INPUT_PULLDOWN);
 pinMode(17, INPUT_PULLDOWN);
 pinMode(16, INPUT_PULLDOWN);
 
-
-
+pinMode(HeatPin, OUTPUT);
+digitalWrite(HeatPin, LOW);
 //Připojení k WiFi
   Sprintln();
   Sprint("Připojuji se k: ");
@@ -206,7 +207,11 @@ voltage = (((analogRead(voltmeas)*8.158)/4095)+0.13);
  Sprint(voltage);
  Sprintln(" V");
 delay(10);
+
 lux = lightMeter.readLightLevel();
+Sprint("Světelnost: ");
+Sprint(lux);
+Sprintln(" lux");
 char status;
   double T, P, p0; //Creating variables for temp, pressure and relative pressure
 
@@ -226,43 +231,22 @@ Sprint(F("Teplota: "));
     Sprintln(" hPa");
 
     Sprint(F("Relativní tlak: "));
+    delay(5);
     p0 = (((bmp.readPressure())/pow((1-((float)(NadmVys))/44330), 5.255))/100.0);
+    delay(5);
+    if (p0 < 950) {
+      delay(100);
+      bmp.readPressure();
+      p0 = (((bmp.readPressure())/pow((1-((float)(NadmVys))/44330), 5.255))/100.0);
+      delay(10);
+      }
+//    else{}
+
     Sprint(p0);
     Sprintln(" hPa");
 
     
 
-/*  status = pressure.startTemperature();
-  if (status != 0) {
-    delay(status);
-
-    status = pressure.getTemperature(T);
-    if (status != 0) {
-      Sprint("Teplota: ");
-      Sprint(bmp.readTemperature());
-      Sprintln(" °C");
-
-      status = pressure.startPressure(3);
-
-      if (status != 0) {
-        delay(status);
-
-        status = pressure.getPressure(P, T);
-        if (status != 0) {
-          Sprint("Absolutní tlak: ");
-          Sprint(P);
-          Sprintln(" hPa");
-
-          p0 = pressure.sealevel(P, NadmVys);
-          Sprint("Relativní tlak: ");
-          Sprint(p0);
-          Sprintln(" hPa");
-        }
-      }
-    }
-  }  
-
-  */
   delay(1);
 
 if (T < MinTemp) {HeatOn = 1;}
@@ -337,7 +321,7 @@ td = dht.readTemperature();
 
 if (isnan(hd) || isnan(td)) {
     Sprintln(F("Failed to read from DHT sensor!"));
-    return;
+ //   return;
   }
 
 Sprint(F("Vlhkost: "));
@@ -351,7 +335,7 @@ Sprint(F("Vlhkost: "));
   int refLevel = averageAnalogRead(REF_3V3);
 
   //Use the 3.3V power pin as a reference to get a very accurate output value from sensor
-  float outputVoltage = 3.3 / refLevel * uvLevel;   // adjust outputVoltage to actual voltage in case you read negative values.
+  float outputVoltage = 3.3 / 4095 * uvLevel;   // adjust outputVoltage to actual voltage in case you read negative values.
 
   float uvIntensity = mapfloat(outputVoltage, 0.99, 2.8, 0.0, 15.0); //Convert the voltage to a UV intensity level
  if (uvIntensity < 0) {
@@ -455,8 +439,9 @@ if (rescnt == 6) {
   Sprintln(rescnt);
  
 }
-delay(10000);
+delay(mezera);
 digitalWrite(LEDDIAG, HIGH ); 
+
 delay(100);   
 }
 
