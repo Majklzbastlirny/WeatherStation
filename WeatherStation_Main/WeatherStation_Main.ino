@@ -11,13 +11,15 @@ https://youtu.be/LY-1DHTxRAk?t=355
 #include <WiFi.h>
 #include <BH1750.h>
 #include <Wire.h>
-#include "DHT.h"
 #include <Adafruit_BMP280.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID         "Edma_UBNT"
-#define WLAN_PASS         "pes_Fido"
+#define WLAN_SSID         "MediumRecords"
+#define WLAN_PASS         "123456780"
 
 
 /************************* MQTT Broker Setup *********************************/
@@ -44,6 +46,7 @@ Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/UV");
 Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/WV");
 Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Speed");
 Adafruit_MQTT_Publish BatVoltage = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Voltage");
+Adafruit_MQTT_Publish Heater = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/HeaterStatus");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 //Seriový výstup zapnut
@@ -98,9 +101,9 @@ Adafruit_BMP280 bmp;
 
 //Proměnné k vyhřívacímu systému
 RTC_DATA_ATTR bool HeatOn = 0;
-int MinTemp = 3;
+int MinTemp = 1;
 #define HeatPin 4
-
+bool Heatin = 0;
 //Proměnné k senzoru napětí
 #define voltmeas 32
 float voltage = 0;
@@ -249,8 +252,14 @@ Sprint(F("Teplota: "));
 
   delay(1);
 
-if (T < MinTemp) {HeatOn = 1;}
-else if (T >= MinTemp) {HeatOn = 0;}
+if (T < MinTemp) {
+  digitalWrite(HeatPin, 1);
+  Heatin = 1;
+  }
+else if (T >= MinTemp) {
+  digitalWrite(HeatPin, 0);
+  Heatin = 0;
+  }
 else {}
 
 pinMode(AnemoPIN, INPUT);
@@ -313,11 +322,11 @@ Sprint(D2);
 Sprint(" ");
 Sprint(D1);
 Sprintln("");
-
+delay(100);
 hd = dht.readHumidity();
   
 td = dht.readTemperature();
-
+delay(100);
 
 if (isnan(hd) || isnan(td)) {
     Sprintln(F("Failed to read from DHT sensor!"));
@@ -423,6 +432,14 @@ delay(150);
  
 Sprint(F("Probíhá odesílání napětí baterie:"));
  if (! BatVoltage.publish(voltage)) {
+    Sprintln(F(" Failed"));
+  } else {
+    Sprintln(F(" OK!"));
+  }    
+delay(150);
+
+Sprint(F("Probíhá odesílání stavu vytápění:"));
+ if (! Heater.publish(Heatin)) {
     Sprintln(F(" Failed"));
   } else {
     Sprintln(F(" OK!"));
