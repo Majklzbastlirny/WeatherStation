@@ -18,8 +18,8 @@ https://youtu.be/LY-1DHTxRAk?t=355
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID         "MediumRecords"
-#define WLAN_PASS         "123456780"
+#define WLAN_SSID         "Edma_Loznice"
+#define WLAN_PASS         "pes_Fido"
 
 
 /************************* MQTT Broker Setup *********************************/
@@ -42,6 +42,7 @@ Adafruit_MQTT_Publish temperature2 = Adafruit_MQTT_Publish(&mqtt, "WeatherStatio
 Adafruit_MQTT_Publish humidity = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Humidity");
 Adafruit_MQTT_Publish light = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Light");
 Adafruit_MQTT_Publish presss = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Pressure");
+Adafruit_MQTT_Publish pressraw = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/PressureRAW");
 Adafruit_MQTT_Publish UV = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/UV");
 Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/WV");
 Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Speed");
@@ -76,7 +77,7 @@ float wv = 0;
 float ws = 0; //V M/S
 #define AnemoPIN  35
 
-float AnemoTime = 1000; //doba měření rychlosti v ms
+float AnemoTime = 10000; //doba měření rychlosti v ms
 byte pulses = 0;
  
 //Proměnné k senzoru intenzity UV zařízení
@@ -101,7 +102,7 @@ Adafruit_BMP280 bmp;
 
 //Proměnné k vyhřívacímu systému
 RTC_DATA_ATTR bool HeatOn = 0;
-int MinTemp = 1;
+int MinTemp = -20;
 #define HeatPin 4
 bool Heatin = 0;
 //Proměnné k senzoru napětí
@@ -110,7 +111,7 @@ float voltage = 0;
 
 //Proměnné k odpojovači senzorů
 #define SensorPWR 25
-int wificount = 0;
+short wificount = 0;
 /*************************** Vlastní kód ************************************/
 
 
@@ -144,21 +145,27 @@ digitalWrite(HeatPin, LOW);
 
   WiFi.begin(WLAN_SSID, WLAN_PASS);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(400);
     Sprint(".");
     wificount++;
-/*    if (wificount = 10){
+    //Sprint(wificount);
+    delay(100);
+   if (wificount < 20){
+      
+      }
+    else {
       digitalWrite(SensorPWR, LOW);
       ESP.restart();
+      
       }
-    else {}
-*/
+
     
   }
   Sprintln();
 
   Sprintln("Uspěšně připojeno");
-  Sprintln("Moje IP adresa: "); Sprintln(WiFi.localIP());
+  Sprint("Moje IP adresa: ");
+  Sprintln(WiFi.localIP());
   long rssi = WiFi.RSSI();
   Sprint("Síla WiFi signálu je: ");
   Sprint(rssi);
@@ -400,6 +407,14 @@ delay(150);
 
   Sprint(F("Probíhá odesílání tlaku:"));
  if (! presss.publish(p0)) {
+    Sprintln(F(" Failed"));
+  } else {
+    Sprintln(F(" OK!"));
+  } 
+delay(150);
+
+ Sprint(F("Probíhá odesílání tlaku (RAW):"));
+ if (! pressraw.publish(P)) {
     Sprintln(F(" Failed"));
   } else {
     Sprintln(F(" OK!"));
