@@ -96,13 +96,20 @@ DHT dht(DHTPIN, DHTTYPE);
 float lux = 0; 
 BH1750 lightMeter;
 
-//Proměnné k senzoru teploty a tlaku BMP180
+//Proměnné k senzoru teploty a tlaku BMP280
 Adafruit_BMP280 bmp;
 #define NadmVys 333
 
+#define PressMAX 1057
+#define PressMIN 967
+#define PressMAXa 1014
+#define PressMINa 927
+RTC_DATA_ATTR int GoodPress = 0;
+RTC_DATA_ATTR int GoodPressABS = 0;
+
 //Proměnné k vyhřívacímu systému
 RTC_DATA_ATTR bool HeatOn = 0;
-int MinTemp = -20;
+int MinTemp = -8;
 #define HeatPin 4
 bool Heatin = 0;
 //Proměnné k senzoru napětí
@@ -150,7 +157,7 @@ digitalWrite(HeatPin, LOW);
     wificount++;
     //Sprint(wificount);
     delay(100);
-   if (wificount < 20){
+   if (wificount < 40){
       
       }
     else {
@@ -235,23 +242,22 @@ Sprint(F("Teplota: "));
     Sprint(T);
     Sprintln(" *C");
 
+//repair this SHIT
     Sprint(F("Absolutní tlak: "));
     P = (bmp.readPressure()/100);
+     if (P > PressMAX || P < PressMIN) {
+      P = 0;
+    }
     Sprint(P);
     Sprintln(" hPa");
 
     Sprint(F("Relativní tlak: "));
     delay(5);
     p0 = (((bmp.readPressure())/pow((1-((float)(NadmVys))/44330), 5.255))/100.0);
-    delay(5);
-    if (p0 < 950) {
-      delay(100);
-      bmp.readPressure();
-      p0 = (((bmp.readPressure())/pow((1-((float)(NadmVys))/44330), 5.255))/100.0);
-      delay(10);
-      }
-//    else{}
-
+    if (p0 > PressMAX || p0 < PressMIN) {
+      p0 = 0;
+    }
+    else {}
     Sprint(p0);
     Sprintln(" hPa");
 
@@ -405,6 +411,8 @@ if (! light.publish(lux)) {
   }
 delay(150);
 
+if (P != 0) {
+
   Sprint(F("Probíhá odesílání tlaku:"));
  if (! presss.publish(p0)) {
     Sprintln(F(" Failed"));
@@ -420,6 +428,8 @@ delay(150);
     Sprintln(F(" OK!"));
   } 
 delay(150);
+}
+else {}
 
   Sprint(F("Probíhá odesílání UV intenzity:"));
  if (! UV.publish(uvIntensity)) {
