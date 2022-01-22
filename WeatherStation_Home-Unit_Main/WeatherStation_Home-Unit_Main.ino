@@ -6,7 +6,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SH110X.h>
-#include <Adafruit_BME280.h>
+#include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
@@ -25,13 +25,13 @@ Adafruit_MQTT_Client mqtt(&client, MQTT_BROKER_IP, MQTT_BROKER_PORT, MQTT_USERNA
 
 /************************* MQTT Topics ***************************************/
 
-Adafruit_MQTT_Subscribe temperature = Adafruit_MQTT_Subscribe(&mqtt, "weatherStation/temperature");
-Adafruit_MQTT_Subscribe humidity = Adafruit_MQTT_Subscribe(&mqtt, "weatherStation/humidity");
-Adafruit_MQTT_Subscribe light = Adafruit_MQTT_Subscribe(&mqtt, "weatherStation/light");
-Adafruit_MQTT_Subscribe presss = Adafruit_MQTT_Subscribe(&mqtt, "weatherStation/pressure");
-Adafruit_MQTT_Subscribe UV = Adafruit_MQTT_Subscribe(&mqtt, "weatherStation/UV");
-Adafruit_MQTT_Subscribe WV = Adafruit_MQTT_Subscribe(&mqtt, "weatherStation/WV");
-Adafruit_MQTT_Subscribe WS = Adafruit_MQTT_Subscribe(&mqtt, "weatherStation/Speed");
+Adafruit_MQTT_Subscribe temperature = Adafruit_MQTT_Subscribe(&mqtt, "WeatherStation/Temperature");
+Adafruit_MQTT_Subscribe humidity = Adafruit_MQTT_Subscribe(&mqtt, "WeatherStation/Humidity");
+Adafruit_MQTT_Subscribe light = Adafruit_MQTT_Subscribe(&mqtt, "WeatherStation/Light");
+Adafruit_MQTT_Subscribe presss = Adafruit_MQTT_Subscribe(&mqtt, "WeatherStation/Pressure");
+Adafruit_MQTT_Subscribe UV = Adafruit_MQTT_Subscribe(&mqtt, "WeatherStation/UV");
+Adafruit_MQTT_Subscribe WV = Adafruit_MQTT_Subscribe(&mqtt, "WeatherStation/WV");
+Adafruit_MQTT_Subscribe WS = Adafruit_MQTT_Subscribe(&mqtt, "WeatherStation/Speed");
 
 
 
@@ -61,10 +61,10 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
-Adafruit_BME280 bme;
+Adafruit_BMP280 bme;
 void setup()   {
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   mqtt.subscribe(&temperature);
   mqtt.subscribe(&humidity);
   mqtt.subscribe(&light);
@@ -87,14 +87,14 @@ WiFi.begin(ssid, password);
 
   display.begin(i2c_Address, true); // Address 0x3C default
 // display.setContrast (50); // dim display
- if (!bme.begin(0x76, &Wire)) { 
+ if (!bme.begin(0x76, 0x58)) { 
 Serial.println("Could not find a valid BMP280 sensor, check wiring!");
 while (1);
 }
  
  Serial.println(bme.readPressure());
 Serial.println(bme.readTemperature());
-    Serial.print(bme.readHumidity());
+  //  Serial.print(bme.readHumidity());
 
 
 }
@@ -267,7 +267,8 @@ display.setCursor(80, 0);
   display.setCursor(0, 19);
 display.print("Vlhkost doma: ");
   
-  display.print(bme.readHumidity());
+//  display.print(bme.readHumidity());
+ display.print((char *)humidity.lastread);
   display.setCursor(122, 19);
   display.println("%");
   
