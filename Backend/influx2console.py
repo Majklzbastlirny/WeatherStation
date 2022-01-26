@@ -18,7 +18,6 @@ for table in result:
     for record in table.records:
         results.append((record.get_measurement(), record.get_value()))
 
-
 listToStr = '-'.join([str(elem) for elem in results])
 listToStr = listToStr.replace(",", ":")
 listToStr = listToStr.replace("-", ",")  
@@ -28,3 +27,4 @@ listToStr = listToStr.replace(")", "\"")
 listToStr = listToStr.replace(": ", ":\"")
 
 print("{" + listToStr + "}") 
+client.close()
