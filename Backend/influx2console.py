@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import json
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
@@ -18,4 +18,13 @@ for table in result:
     for record in table.records:
         results.append((record.get_measurement(), record.get_value()))
 
-print(results)
+
+listToStr = '-'.join([str(elem) for elem in results])
+listToStr = listToStr.replace(",", ":")
+listToStr = listToStr.replace("-", ",")  
+listToStr = listToStr.replace("('", "\"")
+listToStr = listToStr.replace("\'", "\"")
+listToStr = listToStr.replace(")", "\"")
+listToStr = listToStr.replace(": ", ":\"")
+
+print("{" + listToStr + "}") 
