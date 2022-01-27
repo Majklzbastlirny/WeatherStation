@@ -1,9 +1,7 @@
 from datetime import datetime
-import json
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-# You can generate an API token from the "API Tokens Tab" in the UI
 token = "H4hYgXBEUTFRivBBLdo0Pk_ca1qCAmN8O-LRGjRLRoVitVGcSfervwQQOKa8Jka7rwDa2m7EDlqZn_MmNqsezQ=="
 org = "MajklovaBastlirna"
 bucket = "WeatherStation"
