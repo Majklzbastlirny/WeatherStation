@@ -7,7 +7,7 @@ org = "MajklovaBastlirna"
 bucket = "WeatherStation"
 query = 'from(bucket: "WeatherStation") |> range(start: -1m) |> last()'
 
-client =  InfluxDBClient(url="http://192.168.0.8:8086", token=token, org=org)
+client =  InfluxDBClient(url="http://bladyhel.serveminecraft.net:8086", token=token, org=org)
       
 result = client.query_api().query(query, org=org)
 
@@ -21,8 +21,8 @@ listToStr = listToStr.replace(",", ":")
 listToStr = listToStr.replace("-", ",")  
 listToStr = listToStr.replace("('", "\"")
 listToStr = listToStr.replace("\'", "\"")
-listToStr = listToStr.replace(")", "\"")
-listToStr = listToStr.replace(": ", ":\"")
+listToStr = listToStr.replace(")", "")
+listToStr = listToStr.replace(": ", ":")
 
 print("{" + listToStr + "}") 
 client.close()
