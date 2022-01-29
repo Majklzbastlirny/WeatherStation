@@ -48,6 +48,9 @@ Adafruit_MQTT_Publish WV = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/WV");
 Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Speed");
 Adafruit_MQTT_Publish BatVoltage = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Voltage");
 Adafruit_MQTT_Publish Heater = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/HeaterStatus");
+Adafruit_MQTT_Publish Dew = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/DewPoint");
+//Adafruit_MQTT_Publish HInd = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/HIndex");
+Adafruit_MQTT_Publish WChill = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/WChill");
 
 /******************* Globální proměnné, definice a objekty **************************************/
 //Seriový výstup zapnut
@@ -75,6 +78,7 @@ float wv = 0;
 
 //Proměnné k anemometru
 float ws = 0; //V M/S
+float wsm = 0;
 #define AnemoPIN  35
 
 float AnemoTime = 10000; //doba měření rychlosti v ms
@@ -91,6 +95,10 @@ float td = 0;
 #define DHTPIN 23 //4
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE); 
+double DewPoint = 0;
+double HeatIndex = 0;
+double WindChill = 0;
+
 
 //Proměnné k senzoru světla BH1750
 float lux = 0; 
@@ -99,7 +107,7 @@ BH1750 lightMeter;
 //Proměnné k senzoru teploty a tlaku BMP280
 Adafruit_BMP280 bmp;
 #define NadmVys 333
-
+double Tf = 0;
 #define PressMAX 1057
 #define PressMIN 967
 #define PressMAXa 1014
@@ -119,6 +127,17 @@ float voltage = 0;
 //Proměnné k odpojovači senzorů
 #define SensorPWR 25
 short wificount = 0;
+
+//konstanty pro výpočet teplotního indexu
+float c1 = -8.78469475556;
+float c2 = 1.61139411;
+float c3 = 2.33854883889;
+float c4 = -0.14611605;
+float c5 = -0.012308094;
+float c6 = -0.0164248277778;
+float c7 = 0.002211732;
+float c8 = 0.002211732;
+float c9 = -0.000003582;
 /*************************** Vlastní kód ************************************/
 
 
@@ -240,7 +259,10 @@ char status;
 Sprint(F("Teplota: "));
     T = bmp.readTemperature();
     Sprint(T);
-    Sprintln(" *C");
+    Sprint(" *C = ");
+    Tf = ((T*1.8)+32);
+    Sprint(Tf);
+    Sprintln(" °F");
 
 //repair this SHIT
     Sprint(F("Absolutní tlak: "));
@@ -283,7 +305,10 @@ detachInterrupt(AnemoPIN);
 ws = 2*PI*0.08*(pulses/AnemoTime/2*1000);
 Sprint("Rychlost větru: ");
 Sprint(ws);
-Sprintln(" m/s");
+Sprint(" m/s = ");
+wsm = ws*3.6;
+Sprint(wsm);
+Sprintln(" km/h");
 
 
 if (D1 ==  1 && D2 == 0  && D3 == 0 && D4 == 0 && D5 == 0 ) { wv = 0; }
@@ -353,6 +378,25 @@ Sprint(F("Vlhkost: "));
   Sprint(td);
   Sprintln(F(" °C "));
 
+
+DewPoint = (T-(100-hd)/5.883);
+
+ Sprint(F("Rosný bod je "));
+ Sprint(DewPoint);
+ Sprintln("°C");
+
+WindChill = (13.12 + 0.6215*T-11.37*pow(wsm, 0.16)+0.3965*T*pow(wsm, 0.16));
+
+Sprint(F("Větrný chlad je: "));
+ Sprint(WindChill);
+ Sprintln("°C");
+/*
+ HeatIndex = 0;
+ //HeatIndex = ((HeatIndex-32)/1.8);
+ Sprint(F("Pocitová teplota je: "));
+ Sprint(HeatIndex);
+ Sprintln("°C");
+*/
  int uvLevel = averageAnalogRead(UVOUT);
   int refLevel = averageAnalogRead(REF_3V3);
 
@@ -470,7 +514,32 @@ Sprint(F("Probíhá odesílání stavu vytápění:"));
     Sprintln(F(" OK!"));
   }    
 delay(150);
- 
+
+Sprint(F("Probíhá odesílání rosného bodu:"));
+ if (! Dew.publish(DewPoint)) {
+    Sprintln(F(" Failed"));
+  } else {
+    Sprintln(F(" OK!"));
+  }    
+delay(150);
+/*
+Sprint(F("Probíhá odesílání pocitové teploty:"));
+ if (! HInd.publish(HeatIndex)) {
+    Sprintln(F(" Failed"));
+  } else {
+    Sprintln(F(" OK!"));
+  }    
+delay(150);
+*/
+Sprint(F("Probíhá odesílání větrného chladu:"));
+ if (! WChill.publish(WindChill)) {
+    Sprintln(F(" Failed"));
+  } else {
+    Sprintln(F(" OK!"));
+  }    
+delay(150);
+
+  
 rescnt++;
 if (rescnt == 6) {
   //ESP.restart();
