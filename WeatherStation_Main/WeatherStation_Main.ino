@@ -49,7 +49,7 @@ Adafruit_MQTT_Publish WS = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Speed");
 Adafruit_MQTT_Publish BatVoltage = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/Voltage");
 Adafruit_MQTT_Publish Heater = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/HeaterStatus");
 Adafruit_MQTT_Publish Dew = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/DewPoint");
-//Adafruit_MQTT_Publish HInd = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/HIndex");
+Adafruit_MQTT_Publish HInd = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/HIndex");
 Adafruit_MQTT_Publish WChill = Adafruit_MQTT_Publish(&mqtt, "WeatherStation/WChill");
 
 /******************* Globální proměnné, definice a objekty **************************************/
@@ -267,20 +267,20 @@ Sprint(F("Teplota: "));
 //repair this SHIT
     Sprint(F("Absolutní tlak: "));
     P = (bmp.readPressure()/100);
-     if (P > PressMAX || P < PressMIN) {
+/*    if (P > PressMAX || P < PressMIN) {
       P = 0;
-    }
-    Sprint(P);
+   }
+*/    Sprint(P);
     Sprintln(" hPa");
 
     Sprint(F("Relativní tlak: "));
     delay(5);
     p0 = (((bmp.readPressure())/pow((1-((float)(NadmVys))/44330), 5.255))/100.0);
-    if (p0 > PressMAX || p0 < PressMIN) {
+/*    if (p0 > PressMAX || p0 < PressMIN) {
       p0 = 0;
     }
-    else {}
-    Sprint(p0);
+      else {}
+*/    Sprint(p0);
     Sprintln(" hPa");
 
     
@@ -384,19 +384,21 @@ DewPoint = (T-(100-hd)/5.883);
  Sprint(F("Rosný bod je "));
  Sprint(DewPoint);
  Sprintln("°C");
-
+if ((T < 10)&&(wsm > 4.8)) { 
 WindChill = (13.12 + 0.6215*T-11.37*pow(wsm, 0.16)+0.3965*T*pow(wsm, 0.16));
+}
+else { WindChill=T;}
 
 Sprint(F("Větrný chlad je: "));
  Sprint(WindChill);
  Sprintln("°C");
-/*
- HeatIndex = 0;
- //HeatIndex = ((HeatIndex-32)/1.8);
+
+ 
+ HeatIndex = dht.computeHeatIndex(T, hd, false);
  Sprint(F("Pocitová teplota je: "));
  Sprint(HeatIndex);
  Sprintln("°C");
-*/
+
  int uvLevel = averageAnalogRead(UVOUT);
   int refLevel = averageAnalogRead(REF_3V3);
 
@@ -522,7 +524,7 @@ Sprint(F("Probíhá odesílání rosného bodu:"));
     Sprintln(F(" OK!"));
   }    
 delay(150);
-/*
+
 Sprint(F("Probíhá odesílání pocitové teploty:"));
  if (! HInd.publish(HeatIndex)) {
     Sprintln(F(" Failed"));
@@ -530,7 +532,7 @@ Sprint(F("Probíhá odesílání pocitové teploty:"));
     Sprintln(F(" OK!"));
   }    
 delay(150);
-*/
+
 Sprint(F("Probíhá odesílání větrného chladu:"));
  if (! WChill.publish(WindChill)) {
     Sprintln(F(" Failed"));
