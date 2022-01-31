@@ -8,4 +8,4 @@ curl --request POST \
         |> last()'
 		
 		
-curl --request POST http://192.168.0.8:8086/api/v2/query?org=2d5652347a7565e5 --header 'Authorization: Token H4hYgXBEUTFRivBBLdo0Pk_ca1qCAmN8O-LRGjRLRoVitVGcSfervwQQOKa8Jka7rwDa2m7EDlqZn_MmNqsezQ==' --header 'Accept: application/csv' --header 'Content-type: application/vnd.flux' --data 'from(bucket:"WeatherStation") |> range(start: -1m) |> last()'
+curl --request POST http://192.168.0.8:8086/api/v2/query?org=2d5652347a7565e5 --header 'Authorization: Token H4hYgXBEUTFRivBBLdo0Pk_ca1qCAmN8O-LRGjRLRoVitVGcSfervwQQOKa8Jka7rwDa2m7EDlqZn_MmNqsezQ==' --header 'Accept: application/csv' --header 'Content-type: application/vnd.flux' --data 'from(bucket:"WeatherStation") |> range(start: -1h) |> last()'
