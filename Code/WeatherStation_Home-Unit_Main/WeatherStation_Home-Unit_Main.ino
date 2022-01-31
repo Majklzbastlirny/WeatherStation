@@ -200,7 +200,7 @@ display.setTextColor(SH110X_WHITE);
   display.setTextColor(SH110X_WHITE); // 'inverted' text
   display.print((char *)UV.lastread);
   display.setCursor(86, 47);
-  display.println(" mW/mm2");
+  display.println(" mW/cm2");
 
 display.setCursor(0, 57);
 display.print("Vitr: ");
