@@ -63,7 +63,7 @@ void setup() {
 void loop() {
   // Construct a Flux query
   // Query will find the worst RSSI for last hour for each connected WiFi network with this device
-  String query = "from(bucket: \"WeatherStation\") |> range(start: -1h) |> last()";
+  String query = "from(bucket: \"WeatherStation\") |> range(start: -1m) |> last()";
 
   // Print composed query
   Serial.print("Querying with: ");
@@ -76,14 +76,22 @@ void loop() {
 //Serial.print(result);
   // Iterate over rows. Even there is just one row, next() must be called at least once.
   while (result.next()) {
-    // Get converted value for flux result column 'SSID'
-//    String Field = result.getValueByName("_measurement").getString();
-//    Serial.print(Field);
-//    Serial.print(" is: ");
 
-    String Fields = result.getValues().getString();
-    Serial.print(Fields);
-    Serial.print(" is: ");
+String meas = result.getValueByName("_measurement").getString();
+Serial.print(meas);
+Serial.print(" is: ");
+
+String Field = result.getValueByName("_value").getString();
+Serial.print(Field);
+Serial.print("  ");
+
+   String _value = result.getValueByName("_measurement").getString();
+   Serial.print(_value);
+   Serial.print(" is: ");
+
+    // String _values = result.getValueByName("_value").getString();
+  // Serial.print(_values);
+   
     
 
 //    Serial.print("' with RSSI ");

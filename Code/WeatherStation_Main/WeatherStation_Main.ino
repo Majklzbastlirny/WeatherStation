@@ -117,7 +117,7 @@ RTC_DATA_ATTR int GoodPressABS = 0;
 
 //Proměnné k vyhřívacímu systému
 RTC_DATA_ATTR bool HeatOn = 0;
-int MinTemp = -8;
+int MinTemp = 1;
 #define HeatPin 4
 bool Heatin = 0;
 //Proměnné k senzoru napětí
@@ -363,7 +363,7 @@ Sprintln("");
 delay(100);
 hd = dht.readHumidity();
   
-td = dht.readTemperature();
+td = (dht.readTemperature()+0.9);
 delay(100);
 
 if (isnan(hd) || isnan(td)) {
