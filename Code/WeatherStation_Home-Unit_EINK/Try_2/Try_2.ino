@@ -35,7 +35,6 @@ unsigned long delayTime;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println(F("BME280 test"));
   Wire.setClock(9766);
 
   I2CBME.begin(I2C_SDA, I2C_SCL, 9766);
