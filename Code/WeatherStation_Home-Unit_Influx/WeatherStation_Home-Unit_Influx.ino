@@ -58,6 +58,7 @@ char Hours[16];
 
 const char *ssid     = "MediumRecords";
 const char *password = "123456780";
+short wificount = 0;
 
 char daysOfTheWeek[7][12] = {"Nedele", "Pondeli", "Utery", "Streda", "Ctvrtek", "Patek", "Sobota"};
 char months[12][12] = {"Prosinec", "Leden", "Unor", "Brezen", "Duben", "Kveten", "Cerven", "Cervenec", "Srpen", "Zari", "Rijen", "Listopad"};
@@ -88,8 +89,14 @@ void setup()   {
   WiFi.begin(ssid, password);
 
   while ( WiFi.status() != WL_CONNECTED ) {
-    delay ( 500 );
+    delay ( 400 );
     Serial.print ( "." );
+    wificount++;
+    delay(100);
+    if (wificount < 40) {}
+    else {
+      ESP.restart();
+    }
   }
   Serial.println();
 
