@@ -13,12 +13,13 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 #define INFLUXDB_URL "http://192.168.0.8:8086"
+//#define INFLUXDB_URL "http://bladyhel.serveminecraft.net:8086"
 #define INFLUXDB_TOKEN "H4hYgXBEUTFRivBBLdo0Pk_ca1qCAmN8O-LRGjRLRoVitVGcSfervwQQOKa8Jka7rwDa2m7EDlqZn_MmNqsezQ=="
 #define INFLUXDB_ORG "2d5652347a7565e5"
 #define INFLUXDB_BUCKET "WeatherStation"
 String query = "from(bucket: \"" INFLUXDB_BUCKET "\") |> range(start: -1h) |> last() ";
 
-double SleepTime = 30; //v sekundách
+double SleepTime = 20; //v sekundách
 
 // Set timezone string according to https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html
 #define TZ_INFO "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -39,8 +40,10 @@ double temperature = 0;
 double temperature2 = 0;
 double uv = 0;
 double voltage = 0;
-double winddir = 0;
+byte winddir = 0;
 double windchill = 0;
+
+char* winddirection = 0;
 
 short Year = 0;
 short Month = 0;
@@ -74,6 +77,14 @@ void setup()   {
   Serial.begin(115200);
   Serial.println();
 
+  display.begin(i2c_Address, true); // Address 0x3C default
+  if (!bme.begin(0x76, 0x58)) {
+    Serial.println("Could not find a valid BMP280 sensor, check wiring!");
+    while (1);
+  }
+  display.clearDisplay();
+  display.display();
+
   WiFi.begin(ssid, password);
 
   while ( WiFi.status() != WL_CONNECTED ) {
@@ -83,12 +94,6 @@ void setup()   {
   Serial.println();
 
 
-
-  display.begin(i2c_Address, true); // Address 0x3C default
-  if (!bme.begin(0x76, 0x58)) {
-    Serial.println("Could not find a valid BMP280 sensor, check wiring!");
-    while (1);
-  }
 
   Serial.println(bme.readPressure());
   Serial.println(bme.readTemperature());
@@ -129,10 +134,10 @@ void setup()   {
   display.setFont();
   display.setTextColor(SH110X_WHITE);
   display.clearDisplay();
-    display.drawLine(28, 0, 28, 64, SH110X_WHITE);
-    display.drawLine(100, 0, 100, 64, SH110X_WHITE);
+  // display.drawLine(28, 0, 28, 64, SH110X_WHITE);
+  //display.drawLine(100, 0, 100, 64, SH110X_WHITE);
   char bufferdate[32];
-  sprintf(bufferdate, "%s, %d.%d %d", daysOfTheWeek[WeekDay], Day, Month, Year);
+  sprintf(bufferdate, "%s, %d.%d. %d", daysOfTheWeek[WeekDay], Day, Month, Year);
   drawCentreString(bufferdate, 75, 0);
 
   display.setFont(&FreeSans9pt7b);
@@ -140,208 +145,141 @@ void setup()   {
   sprintf(Hours, "%02i", Hour);
   sprintf(Minutes, "%02i", Minute);
   sprintf(Seconds, "%02i", Second);
-  sprintf(buffertime, "%s:%s:%s", Hours, Minutes, Seconds);
+  sprintf(buffertime, "%s : %s : %s", Hours, Minutes, Seconds);
   //display.print(buffertime);
-  drawCentreString(buffertime, 91, 25);
-
-
-  /*
-    //display.print(ctime(&tnow));
-    display.print(temperature);
-    display.print("  °C  ");
-    display.println(bme.readTemperature());
-    display.setFont();
-
-    display.print(Month);
-    display.print(".");
-    display.print(Day);
-    display.print(". ");
-  */
+  drawCentreString(buffertime, 80, 25);
   display.display();
+
+  delay(5000);
+  display.clearDisplay();
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 15);
+  display.println("Teplota");
+  display.setCursor(0, 40);
+  display.setFont();
+  display.println("Doma            Venku");
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 62);
+  display.print(bme.readTemperature());
+  display.drawCircle(48, 50, 1, SH110X_WHITE);
+
+  display.setCursor(90, 62);
+  display.print(temperature);
+  display.drawCircle(126, 50, 1, SH110X_WHITE);
+  display.display();
+
+  delay(5000);
+  display.clearDisplay();
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 15);
+  display.print("Teploty");
+  display.setFont();
+
+  display.setCursor(0, 29);
+  display.print("Pocitova:      ");
+  display.print(heatindex);
+  display.drawCircle(126, 30, 1, SH110X_WHITE);
+
+  display.setCursor(0, 39);
+  display.print("Vetrny chlad:  ");
+
+  display.print(windchill);
+  display.drawCircle(126, 40, 1, SH110X_WHITE);
+
+  display.setCursor(0, 49);
+  display.print("Rosny bod:     ");
+
+  display.print(dewpoint);
+  display.drawCircle(126, 50, 1, SH110X_WHITE);
+
+
+
+  display.display();
+
+
+  delay(5000);
+  display.clearDisplay();
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 15);
+  display.println("Tlak");
+  display.setCursor(0, 40);
+  display.setFont();
+  display.println("Absolutni   Relativni");
+
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 62);
+  display.print(pressureraw);
+
+  display.setCursor(70, 62);
+  display.print(pressure);
+  display.display();
+
+  delay(5000);
+  display.clearDisplay();
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 15);
+  display.println("Svetlo");
+  display.setCursor(0, 40);
+  display.setFont();
+  display.println("Svetlo   UV intenzita");
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 62);
+  display.print(light);
+  //display.print(lx);
+  display.setCursor(70, 62);
+  display.print(uv);
+  //  display.print(mW/cm2);
+  display.display();
+
+
+  delay(5000);
+  display.clearDisplay();
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 15);
+  display.println("Vitr");
+  display.setCursor(0, 40);
+  display.setFont();
+  display.println("Rychlos  Smer (odkud)");
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 62);
+  display.print(wspeed);
+  display.print(" m/s");
+
+
+  display.setCursor(90, 62);
+  display.print(winddirection);
+  //display.print(winddir);
+  //display.drawCircle(126, 50, 1, SH110X_WHITE);
+  display.display();
+
+
+  delay(5000);
+  display.clearDisplay();
+  display.setFont(&FreeSans9pt7b);
+  display.setCursor(0, 15);
+  display.print("Vlhkost:");
+  display.setCursor(110, 15);
+  display.print("%");
+  display.setCursor(65, 15);
+  display.print(humidity);
+  display.setCursor(0, 35);
+  display.print("Srazky: ");
+  display.print(precipitation);
+  display.setCursor(102, 35);
+  display.setFont();
+  display.print("mm/h");
+  display.display();
+  delay(5000);
+  display.clearDisplay();
+  display.display();
+
+
+
   ESP.deepSleep(SleepTime * 1000000);
 }
 void loop() {
 
-
-
-  /*  unsigned long epochTime = timeClient.getEpochTime();
-    struct tm *ptm = gmtime ((time_t *)&epochTime);
-    Serial.print("Epoch Time: ");
-    Serial.println(epochTime);
-    int monthDay = ptm->tm_mday;
-    Serial.print("Month day: ");
-    Serial.println(monthDay);
-
-    int currentMonth = ptm->tm_mon + 1;
-    Serial.print("Month: ");
-    Serial.println(currentMonth);
-
-
-
-
-
-
-    Serial.print(daysOfTheWeek[timeClient.getDay()]);
-    Serial.print(" ");
-    //Serial.print(timeClient.getHours());
-    //Serial.print(":");
-    //Serial.print(timeClient.getMinutes());
-    //Serial.print(":");
-    //Serial.println(timeClient.getSeconds());
-    Serial.println(timeClient.getFormattedTime());
-
-
-    //  testdrawline();
-    display.setTextSize(1);
-    display.setTextColor(SH110X_WHITE);
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.print(daysOfTheWeek[timeClient.getDay()]);
-    // display.print("Ctvrtek");
-    display.setCursor(43, 0);
-    display.setTextColor(SH110X_BLACK, SH110X_WHITE);
-    display.print(monthDay);
-    display.print(".");
-    display.print(currentMonth);
-    display.print(".");
-    display.setTextColor(SH110X_WHITE);
-    display.setCursor(80, 0);
-    display.println(timeClient.getFormattedTime());
-    display.drawLine(0, 8, display.width(), 8, SH110X_WHITE);
-    display.setCursor(0, 10);
-    display.setTextColor(SH110X_WHITE);
-    display.print("Teplota venku: ");
-    display.setTextColor(SH110X_WHITE); // 'inverted' text
-    display.print(temperature);
-    display.setCursor(122, 10);
-    display.drawCircle(119, 11, 1, SH110X_WHITE);
-    display.println("C");
-    display.setCursor(0, 19);
-    display.print("Vlhkost venku: ");
-    display.setTextColor(SH110X_WHITE); // 'inverted' text
-    display.setCursor(84, 19);
-    display.print(humidity);
-    display.setCursor(122, 19);
-    display.println("%");
-    display.setCursor(0, 28);
-    display.print("Tlak venku: ");
-    display.setTextColor(SH110X_WHITE); // 'inverted' text
-    display.setCursor(66, 28);
-    display.print(pressure);
-    display.setCursor(104, 28);
-    display.println(" hPa");
-    display.setCursor(0, 37);
-    display.print("Svetlo je: ");
-    display.setTextColor(SH110X_WHITE); // 'inverted' text
-    display.print(light);
-
-    display.setCursor(104, 37);
-    display.println(" lux");
-    display.setCursor(0, 47);
-    display.print("UV je: ");
-    display.setTextColor(SH110X_WHITE); // 'inverted' text
-    display.print(uv);
-    display.setCursor(86, 47);
-    display.println(" mW/cm2");
-
-    display.setCursor(0, 57);
-    display.print("Vitr: ");
-    display.drawCircle(126, 57, 1, SH110X_WHITE);
-    display.setTextColor(SH110X_WHITE); // 'inverted' text
-    display.print(wspeed);
-    //display.setCursor(100, 18);
-    display.print(" m/s  ");
-    display.println(winddir);
-    //display.setCursor(100, 26);
-
-
-
-
-
-    // display.drawLine(0, 63, display.width(), 63, SH110X_WHITE);
-
-    display.display();
-    delay(10000);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.print(daysOfTheWeek[timeClient.getDay()]);
-    // display.print("Ctvrtek");
-    display.setCursor(43, 0);
-    display.setTextColor(SH110X_BLACK, SH110X_WHITE);
-    display.print(monthDay);
-    display.print(".");
-    display.print(currentMonth);
-    display.print(".");
-    display.setTextColor(SH110X_WHITE);
-    display.setCursor(80, 0);
-    display.println(timeClient.getFormattedTime());
-    display.drawLine(0, 8, display.width(), 8, SH110X_WHITE);
-    display.drawLine(0, 63, display.width(), 63, SH110X_WHITE);
-    display.setCursor(0, 10);
-
-
-
-    display.setCursor(0, 10);
-    display.print("Teplota doma: ");
-    // display.setTextColor(SH110X_BLACK, SH110X_WHITE); // 'inverted' text
-    display.print(bme.readTemperature());
-    display.drawCircle(119, 11, 1, SH110X_WHITE);
-    display.setCursor(122, 10);
-    display.setTextColor(SH110X_WHITE);
-    display.println("C");
-    display.setCursor(0, 19);
-    display.print("Vlhkost doma: ");
-
-      display.print((char *)humidity.lastread);
-      display.setCursor(122, 19);
-      display.println("%");
-
-    display.setCursor(0, 28);
-    display.print("Tlak doma: ");
-    display.print(((bme.readPressure()) / pow((1 - ((float)(333)) / 44330), 5.255)) / 100.0);
-    display.setCursor(104, 28);
-    display.println(" hPa");
-
-    display.display();
-    Serial.println("Jdu spát");
-
-  */
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
 
 void Get_Data() {
   FluxQueryResult result = client.query(query);
@@ -406,8 +344,30 @@ void Get_Data() {
     }
     else {}
 
-
-
+    if (winddir > 22.5 && winddir < 67.5) {
+      winddirection = "SV";
+    }
+    else if (winddir > 67.5 && winddir < 112.5) {
+      winddirection = "V";
+    }
+    else if (winddir > 112.5 && winddir < 157.5) {
+      winddirection = "JV";
+    }
+    else if (winddir > 157.5 && winddir < 202.5) {
+      winddirection = "J";
+    }
+    else if (winddir > 202.5 && winddir < 247.5) {
+      winddirection = "JZ";
+    }
+    else if (winddir > 247.5 && winddir < 292.5) {
+      winddirection = "Z";
+    }
+    else if (winddir > 292, 5 && winddir < 337, 5) {
+      winddirection = "SZ";
+    }
+    else {
+      winddirection = "S";
+    }
     Serial.println();
   }
 
