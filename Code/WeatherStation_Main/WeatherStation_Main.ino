@@ -142,6 +142,7 @@ void setup() {
   /******** Nastavení pinů ***********/
   pinMode(LEDDIAG, OUTPUT);
   pinMode(SensorPWR, OUTPUT);
+  digitalWrite(SensorPWR, HIGH);
 
   //Nastavení pinů pro UV senzor
   pinMode(UVOUT, INPUT);
@@ -199,7 +200,7 @@ void loop() {
   WiFi_Disconnect();
 
   rescnt++;
-  if (rescnt == 6) {
+  if (rescnt == 1) {
     Hibernace();
   } else {
     Sprint("Počet provedených měření od restartu: ");
