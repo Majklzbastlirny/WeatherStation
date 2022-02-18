@@ -369,7 +369,7 @@ void Get_Data() {
     else if (winddir > 247.5 && winddir < 292.5) {
       winddirection = "Z";
     }
-    else if (winddir > 292, 5 && winddir < 337, 5) {
+    else if (winddir > 292.5 && winddir < 337.5) {
       winddirection = "SZ";
     }
     else {
