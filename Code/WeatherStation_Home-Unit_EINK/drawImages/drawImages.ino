@@ -4,7 +4,12 @@
  * for 4 bits color (16 colors - well, greys.) MSB first.  At 80 MHz, screen
  * clears execute in 1.075 seconds and images are drawn in 1.531 seconds.
  */
+#include "esp_heap_caps.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
+#include "epd_driver.h"
+#include "epd_highlevel.h"
 #include <Arduino.h>
 #include "epd_driver.h"
 #include "pic1.h"
@@ -17,7 +22,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    epd_init();
+    epd_init(EPD_LUT_1K);
 
     framebuffer = (uint8_t *)heap_caps_malloc(EPD_WIDTH * EPD_HEIGHT / 2, MALLOC_CAP_SPIRAM);
     memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
