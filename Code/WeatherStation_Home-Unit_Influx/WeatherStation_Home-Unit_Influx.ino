@@ -12,8 +12,8 @@
 #include <InfluxDbCloud.h>
 #include <Fonts/FreeSans9pt7b.h>
 
-#define INFLUXDB_URL "http://192.168.0.8:8086"
-//#define INFLUXDB_URL "http://bladyhel.serveminecraft.net:8086"
+//#define INFLUXDB_URL "http://192.168.0.8:8086"
+#define INFLUXDB_URL "http://bladyhel.serveminecraft.net:8086"
 #define INFLUXDB_TOKEN "H4hYgXBEUTFRivBBLdo0Pk_ca1qCAmN8O-LRGjRLRoVitVGcSfervwQQOKa8Jka7rwDa2m7EDlqZn_MmNqsezQ=="
 #define INFLUXDB_ORG "2d5652347a7565e5"
 #define INFLUXDB_BUCKET "WeatherStation"
