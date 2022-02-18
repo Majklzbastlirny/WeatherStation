@@ -37,7 +37,7 @@ void setup() {
   Serial.begin(115200);
   Wire.setClock(9766);
 
-  I2CBME.begin(I2C_SDA, I2C_SCL, 9766);
+  I2CBME.begin(I2C_SDA, I2C_SCL);
 
   bool status;
   status = bme.begin(0x76, &I2CBME);
@@ -48,6 +48,8 @@ void setup() {
   Serial.println(bme.readTemperature());
   Serial.println(bme.readPressure() / 100.0);
   Serial.println(bme.readHumidity());
+esp_deep_sleep_start();
+
 
 }
 
