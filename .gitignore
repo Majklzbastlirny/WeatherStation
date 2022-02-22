@@ -3,6 +3,7 @@ PCBs and other pcb stuff/dont tell mom pls.png
 *.bak
 Backend/test.py
 Code/Backend/TwitterPub.py
+Code\Samples and redundant stuff\WeatherStation_Home-Unit_EINK
 Code/WeatherStation_Home_E-INK/.vscode/settings.json
 Code/WeatherStation_Home_E-INK/components/epd_driver/board_specific.c
 Code/WeatherStation_Home_E-INK/components/epd_driver/builtin_waveforms.c
