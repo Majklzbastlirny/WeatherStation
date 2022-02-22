@@ -63,7 +63,7 @@ Adafruit_MQTT_Publish Precipitation = Adafruit_MQTT_Publish(&mqtt, "WeatherStati
 //#define Sprint(a)
 
 
-#define DOBA_HIBERNACE 10 //v sekundách
+#define DOBA_HIBERNACE 60 //v sekundách
 #define mezera 10000 //mezera mezi měřením (v ms)
 #define LEDDIAG 2
 int rescnt = 0;
@@ -82,7 +82,7 @@ float ws = 0; //V M/S
 float wsm = 0;
 #define AnemoPIN  35
 
-float AnemoTime = 10000; //doba měření rychlosti v ms
+float AnemoTime = 20000; //doba měření rychlosti v ms
 byte pulses = 0;
 
 //Proměnné k senzoru intenzity UV zařízení
@@ -138,7 +138,7 @@ float precipitation = 0;
 void setup() {
   Wire.begin();
   Serial.begin(115200);
-  
+
   /******** Nastavení pinů ***********/
   pinMode(LEDDIAG, OUTPUT);
   pinMode(SensorPWR, OUTPUT);
@@ -164,15 +164,14 @@ void setup() {
   pinMode(AnemoPIN, INPUT);
   pinMode(HeatPin, OUTPUT);
 
-  
-  
+
+
   digitalWrite(HeatPin, LOW);
   digitalWrite(SensorPWR, HIGH);
   delay(2000);
   unsigned status;
   status = bmp.begin(0x76, 0x58);
-  lightMeter.begin();
-  delay(10);
+  
   dht.begin();
   delay(250);
 
@@ -184,14 +183,15 @@ void loop() {
   digitalWrite(LEDDIAG, LOW);
   delay(2000);
   Sprintln("");
+    ReadLight();
 
+  ReadSpeed();
   ReadBattery();
   ReadBMP();
   MeasureUV();
   ReadAngle();
-  ReadSpeed();
   ReadDHT();
-  ReadLight();
+ 
 
   digitalWrite(SensorPWR, LOW);
   WiFi_Connect();
@@ -214,6 +214,7 @@ void loop() {
 
 void MQTT_Connect() {
   int8_t ret;
+  digitalWrite(LEDDIAG, HIGH );
 
   // Stop if already connected.
   if (mqtt.connected()) {
@@ -231,6 +232,7 @@ void MQTT_Connect() {
     retries--;
     if (retries == 0) {
       // basically die and wait for user to reset me
+      digitalWrite(SensorPWR, LOW);
       ESP.restart();
     }
   }
@@ -369,7 +371,10 @@ void ReadAngle() {
 }
 
 void ReadLight() {
+ // lightMeter.begin();
+  delay(200);
   lux = lightMeter.readLightLevel();
+  
   Sprint("Světelnost: ");
   Sprint(lux);
   Sprintln(" lux");
@@ -441,6 +446,7 @@ void WiFi_Connect() {
 void WiFi_Disconnect() {
   WiFi.disconnect(true);  // Disconnect from the network
   WiFi.mode(WIFI_OFF);    // Switch WiFi off
+  digitalWrite(LEDDIAG, LOW);
 }
 
 void MeasureUV() {
@@ -527,7 +533,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání teploty (záloha):"));
   if (! temperature2.publish(td)) {
@@ -535,7 +541,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání vlhkosti:"));
   if (! humidity.publish(hd)) {
@@ -543,7 +549,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání světelnosti:"));
   if (! light.publish(lux)) {
@@ -551,7 +557,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   if (P != 0) {
 
@@ -561,7 +567,7 @@ void PublishMQTT() {
     } else {
       Sprintln(F(" OK!"));
     }
-    delay(50);
+    delay(150);
 
     Sprint(F("Probíhá odesílání tlaku (RAW):"));
     if (! pressraw.publish(P)) {
@@ -569,7 +575,7 @@ void PublishMQTT() {
     } else {
       Sprintln(F(" OK!"));
     }
-    delay(50);
+    delay(150);
   }
   else {}
 
@@ -579,7 +585,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání směru větru:"));
   if (! WV.publish(wv)) {
@@ -587,7 +593,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání rychlosti větru:"));
   if (! WS.publish(ws)) {
@@ -595,7 +601,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání napětí baterie:"));
   if (! BatVoltage.publish(voltage)) {
@@ -603,7 +609,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání stavu vytápění:"));
   if (! Heater.publish(Heatin)) {
@@ -611,7 +617,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání rosného bodu:"));
   if (! Dew.publish(DewPoint)) {
@@ -619,7 +625,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání pocitové teploty:"));
   if (! HInd.publish(HeatIndex)) {
@@ -627,7 +633,7 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
   Sprint(F("Probíhá odesílání větrného chladu:"));
   if (! WChill.publish(WindChill)) {
@@ -635,15 +641,15 @@ void PublishMQTT() {
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 
-  Sprint(F("Probíhá odesílání srážek:"));
+  Sprint(F("Probíhá ůodesílání srážek:"));
   if (! Precipitation.publish(precipitation)) {
     Sprintln(F(" Failed"));
   } else {
     Sprintln(F(" OK!"));
   }
-  delay(50);
+  delay(150);
 }
 
 int averageAnalogRead( int pinToRead)
