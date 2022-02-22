@@ -141,8 +141,7 @@ void setup()   {
   display.setFont();
   display.setTextColor(SH110X_WHITE);
   display.clearDisplay();
-  // display.drawLine(28, 0, 28, 64, SH110X_WHITE);
-  //display.drawLine(100, 0, 100, 64, SH110X_WHITE);
+  
   char bufferdate[32];
   sprintf(bufferdate, "%s, %d.%d. %d", daysOfTheWeek[WeekDay], Day, Month, Year);
   drawCentreString(bufferdate, 75, 0);
