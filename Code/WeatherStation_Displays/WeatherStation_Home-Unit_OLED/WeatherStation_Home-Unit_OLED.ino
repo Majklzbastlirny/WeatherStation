@@ -232,7 +232,7 @@ void setup()   {
   display.setCursor(0, 62);
   display.print(light);
   //display.print(lx);
-  display.setCursor(70, 62);
+  display.setCursor(90, 62);
   display.print(uv);
   //  display.print(mW/cm2);
   display.display();
