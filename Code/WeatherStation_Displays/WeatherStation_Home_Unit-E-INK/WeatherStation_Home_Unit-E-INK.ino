@@ -20,6 +20,8 @@
 #define I2C_SDA 14
 #define I2C_SCL 15
 #define DOBA_HIBERNACE 60 //v sekundách
+#define FAILsleep 30 //v minutách
+RTC_DATA_ATTR byte FAILcount = 0;
 
 
 //#define INFLUXDB_URL "http://192.168.0.8:8086"
@@ -29,7 +31,6 @@
 #define INFLUXDB_BUCKET "WeatherStation"
 String query = "from(bucket: \"" INFLUXDB_BUCKET "\") |> range(start: -1h) |> last() ";
 
-double SleepTime = 20; //v sekundách
 
 // Set timezone string according to https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html
 #define TZ_INFO "CET-1CEST,M3.5.0,M10.5.0/3"
@@ -80,6 +81,8 @@ short Second = 0;
 char Seconds[16];
 char Minutes[16];
 char Hours[16];
+char buffertime[32];
+char bufferdate[32];
 
 const char *ssid     = "MediumRecords";
 const char *password = "123456780";
@@ -111,7 +114,9 @@ void setup()
   Serial.begin(115200);
 
   // Correct the ADC reference voltage
-  Serial.println(" ");
+
+
+
   uint8_t percentage = 100;
   esp_adc_cal_characteristics_t adc_chars;
   esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
@@ -146,22 +151,38 @@ void setup()
   }
   memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
 
-  Rect_t area = {
-    .x = 230,
-    .y = 20,
-    .width = logo_width,
-    .height = logo_height,
-  };
-
+  int cursor_x = 0;
+  int cursor_y = 35;
   epd_poweron();
   epd_clear();
-  // epd_draw_grayscale_image(area, (uint8_t *)logo_data);
+
+  writeln((GFXfont *)&FiraSans, "Probiha pripojovani k WiFi", &cursor_x, &cursor_y, NULL);
   epd_poweroff();
 
 
   I2CBME.begin(I2C_SDA, I2C_SCL, 9766);
 
+
+  Serial.print("Joining failed ");
+  Serial.print(FAILcount);
+  Serial.println(" times");
+  if (FAILcount < 10) {
+
+  }
+  else {
+    FAILcount = 0;
+    epd_clear();
+    cursor_x = 0;
+    cursor_y = 35;
+               writeln((GFXfont *)&FiraSans, "Nepodarilo se pripojit. Za 30 minut zkusim znovu", &cursor_x, &cursor_y, NULL);
+    epd_poweroff();
+
+    esp_sleep_enable_timer_wakeup(FAILsleep * 1000000 * 60);
+    epd_poweroff_all();
+    esp_deep_sleep_start();
+  }
   WiFi_Connect();
+  TimeSync();
   Get_Data();
   WiFi_Disconnect();
   TranslateData();
@@ -186,8 +207,7 @@ void setup()
   Serial.print(bme.readHumidity());
   Serial.println(" %");
 
-  int cursor_x = 10;
-  int cursor_y = 35;
+
 
   char temp[64];
   dtostrf(bme.readTemperature(), 5, 2, temp);
@@ -201,11 +221,17 @@ void setup()
 
 
   epd_poweron();
+  epd_clear();
 
-  cursor_x = 100;
-  cursor_y = 100;
+  cursor_x = 600;
+  cursor_y = 55;
+  writeln((GFXfont *)&FiraSans, bufferdate, &cursor_x, &cursor_y, NULL);
+  cursor_x -= 190;
+  cursor_y += 50;
+  writeln((GFXfont *)&FiraSans, buffertime, &cursor_x, &cursor_y, NULL);
 
 
+ 
   /*-----------------VENKU------------------*/
   cursor_x = 50;
   cursor_y = 55;
@@ -246,19 +272,18 @@ void setup()
   writeln((GFXfont *)&FiraSans, "°C", &cursor_x, &cursor_y, NULL);
 
   cursor_x = 100;
-  cursor_y += 40;
-  writeln((GFXfont *)&FiraSans,"Fouka ", &cursor_x, &cursor_y, NULL);
-  cursor_x += 40;
+  cursor_y += 50;
+
   writeln((GFXfont *)&FiraSans, winddirection, &cursor_x, &cursor_y, NULL);
-  cursor_x += 40;
-  writeln((GFXfont *)&FiraSans, " rychlosti ", &cursor_x, &cursor_y, NULL);
-  cursor_x += 40;
+  cursor_x += 10;
+  writeln((GFXfont *)&FiraSans, "rychlosti", &cursor_x, &cursor_y, NULL);
+  cursor_x += 10;
   writeln((GFXfont *)&FiraSans, WSPEED, &cursor_x, &cursor_y, NULL);
-cursor_x += 40;
-  writeln((GFXfont *)&FiraSans," m/s", &cursor_x, &cursor_y, NULL);
+  cursor_x += 10;
+  writeln((GFXfont *)&FiraSans, "m/s", &cursor_x, &cursor_y, NULL);
 
 
-/*------------------DOMA-----------------*/
+ /*------------------DOMA-----------------*/
   cursor_x = 50;
   cursor_y = 470;
   writeln((GFXfont *)&FiraSans, "Doma", &cursor_x, &cursor_y, NULL);
@@ -266,9 +291,9 @@ cursor_x += 40;
 
 
   cursor_x = 100;
-  cursor_y = 510;
+  cursor_y += 50;
   writeln((GFXfont *)&FiraSans, temp, &cursor_x, &cursor_y, NULL);
-  cursor_x += 15;
+  cursor_x += 10;
   writeln((GFXfont *)&FiraSans, "°C", &cursor_x, &cursor_y, NULL);
   cursor_x += 40;
   writeln((GFXfont *)&FiraSans, hum, &cursor_x, &cursor_y, NULL);
@@ -276,7 +301,9 @@ cursor_x += 40;
   writeln((GFXfont *)&FiraSans, "%", &cursor_x, &cursor_y, NULL);
 
 
-  epd_poweroff();
+
+
+  epd_poweroff_all();
   Hibernace();
 }
 
@@ -298,20 +325,62 @@ void WiFi_Connect() {
     Serial.print(".");
     wificount++;
     delay(100);
-    if (wificount < 40) {
+    if (wificount < 20) {
 
     }
     else {
-      ESP.restart();
+      FAILcount++;
+      esp_sleep_enable_timer_wakeup(1000000);
+      epd_poweroff_all();
+      esp_deep_sleep_start();
+
     }
   }
   Serial.println("Uspěšně připojeno");
+  FAILcount = 0;
   Serial.print("Moje IP adresa: ");
   Serial.println(WiFi.localIP());
   long rssi = WiFi.RSSI();
   Serial.print("Síla WiFi signálu je: ");
   Serial.print(rssi);
   Serial.println(" dBm");
+}
+
+void TimeSync() {
+  timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
+  time_t tnow = time(nullptr);
+  Serial.print("Čas nyní: ");
+  Serial.println(ctime(&tnow));
+
+  time_t now;
+  struct tm * timeinfo;
+  time(&now);
+  timeinfo = localtime(&now);
+  Year  = ((timeinfo->tm_year) + 1900);
+  Month = ((timeinfo->tm_mon) + 1);
+  Day = (timeinfo->tm_mday);
+  WeekDay = (timeinfo->tm_wday);
+  Hour = (timeinfo->tm_hour);
+  Minute = (timeinfo->tm_min);
+  Second = (timeinfo->tm_sec);
+  Serial.println(Year);
+  Serial.println(Month);
+  Serial.println(Day);
+  Serial.println(WeekDay);
+  Serial.println(Hour);
+  Serial.println(Minute);
+  Serial.println(Second);
+
+
+  sprintf(bufferdate, "%s, %d.%d. %d", daysOfTheWeek[WeekDay], Day, Month, Year);
+
+
+
+  sprintf(Hours, "%02i", Hour);
+  sprintf(Minutes, "%02i", Minute);
+  sprintf(Seconds, "%02i", Second);
+  sprintf(buffertime, "%s : %s : %s", Hours, Minutes, Seconds);
+
 
 }
 
@@ -408,28 +477,28 @@ void Get_Data() {
     else {}
     delay(10);
     if (winddir >= 22.5 && winddir < 67.5) {
-      winddirection = "ze severovychodu";
+      winddirection = "Fouka ze severovychodu";
     }
     else if (winddir >= 67.5 && winddir < 112.5) {
-      winddirection = "z vychodu";
+      winddirection = "Fouka z vychodu";
     }
     else if (winddir >= 112.5 && winddir < 157.5) {
-      winddirection = "z jihovychodu";
+      winddirection = "Fouka z jihovychodu";
     }
     else if (winddir >= 157.5 && winddir < 202.5) {
-      winddirection = "z jihu";
+      winddirection = "Fouka z jihu";
     }
     else if (winddir >= 202.5 && winddir < 247.5) {
-      winddirection = "z jihozapadu";
+      winddirection = "Fouka z jihozapadu";
     }
     else if (winddir >= 247.5 && winddir < 292.5) {
-      winddirection = "ze zapadu";
+      winddirection = "Fouka ze zapadu";
     }
     else if (winddir >= 292.5 && winddir <= 337.5) {
-      winddirection = "ze severozapadu";
+      winddirection = "Fouka ze severozapadu";
     }
     else {
-      winddirection = "ze severu";
+      winddirection = "Fouka ze severu";
     }
     Serial.println();
   }
