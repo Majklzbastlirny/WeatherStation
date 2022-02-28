@@ -5,13 +5,15 @@
 #include "freertos/task.h"
 #include "epd_driver.h"
 #include "firasans.h"
+#include "opensans10b.h"
+
+
 #include "esp_adc_cal.h"
 #include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include "logo.h"
+
 #include <InfluxDbClient.h>
 #include <InfluxDbCloud.h>
+//#include "efontEnableAll.h"
 
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
@@ -20,8 +22,9 @@
 #define I2C_SDA 14
 #define I2C_SCL 15
 #define DOBA_HIBERNACE 60 //v sekundách
-#define FAILsleep 30 //v minutách
+//#define FAILsleep 30 //v minutách
 RTC_DATA_ATTR byte FAILcount = 0;
+RTC_DATA_ATTR byte FAILsleep = 30;
 
 
 //#define INFLUXDB_URL "http://192.168.0.8:8086"
@@ -91,7 +94,8 @@ short wificount = 0;
 char daysOfTheWeek[7][12] = {"Nedele", "Pondeli", "Utery", "Streda", "Ctvrtek", "Patek", "Sobota"};
 char months[12][12] = {"Prosinec", "Leden", "Unor", "Brezen", "Duben", "Kveten", "Cerven", "Cervenec", "Srpen", "Zari", "Rijen", "Listopad"};
 
-
+int cursor_x = 0;
+int cursor_y = 0;
 
 
 
@@ -109,10 +113,22 @@ Adafruit_BME280 bme;
 uint8_t *framebuffer;
 int vref = 1100;
 
+Rect_t area1 = {
+  .x = 585,
+  .y = 60,
+  .width = 300,
+  .height = 60
+};
+
+
+
+
 void setup()
 {
   Serial.begin(115200);
-
+  epd_init();
+  DisplayTime();
+  DisplayTimeDate();
   // Correct the ADC reference voltage
 
 
@@ -142,7 +158,7 @@ void setup()
 
 
 
-  epd_init();
+
 
   framebuffer = (uint8_t *)ps_calloc(sizeof(uint8_t), EPD_WIDTH * EPD_HEIGHT / 2);
   if (!framebuffer) {
@@ -151,11 +167,12 @@ void setup()
   }
   memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
 
-  int cursor_x = 0;
-  int cursor_y = 35;
+
   epd_poweron();
   epd_clear();
-
+  DisplayTimeDate();
+  cursor_x = 0;
+  cursor_y = 35;
   writeln((GFXfont *)&FiraSans, "Probiha pripojovani k WiFi", &cursor_x, &cursor_y, NULL);
   epd_poweroff();
 
@@ -174,7 +191,13 @@ void setup()
     epd_clear();
     cursor_x = 0;
     cursor_y = 35;
-               writeln((GFXfont *)&FiraSans, "Nepodarilo se pripojit. Za 30 minut zkusim znovu", &cursor_x, &cursor_y, NULL);
+    writeln((GFXfont *)&FiraSans, "Nepodarilo se pripojit.", &cursor_x, &cursor_y, NULL);
+     cursor_x = 0;
+    cursor_y += 40;
+ writeln((GFXfont *)&FiraSans, "Za 30 minut zkusim znovu", &cursor_x, &cursor_y, NULL);
+    
+    DisplayTime();
+    DisplayTimeDate();
     epd_poweroff();
 
     esp_sleep_enable_timer_wakeup(FAILsleep * 1000000 * 60);
@@ -185,7 +208,6 @@ void setup()
   TimeSync();
   Get_Data();
   WiFi_Disconnect();
-  TranslateData();
 
 
 
@@ -223,85 +245,82 @@ void setup()
   epd_poweron();
   epd_clear();
 
-  cursor_x = 600;
-  cursor_y = 55;
-  writeln((GFXfont *)&FiraSans, bufferdate, &cursor_x, &cursor_y, NULL);
-  cursor_x -= 190;
-  cursor_y += 50;
-  writeln((GFXfont *)&FiraSans, buffertime, &cursor_x, &cursor_y, NULL);
+  DisplayTimeDate();
 
 
- 
+
   /*-----------------VENKU------------------*/
   cursor_x = 50;
   cursor_y = 55;
-  writeln((GFXfont *)&FiraSans, "Venku", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, "Venku", &cursor_x, &cursor_y, framebuffer);
 
 
 
   cursor_x = 100;
   cursor_y = 100;
-  writeln((GFXfont *)&FiraSans, TEMPERATURE, &cursor_x, &cursor_y, NULL);
-  cursor_x += 50;
-  writeln((GFXfont *)&FiraSans, "°C", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, TEMPERATURE, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
   cursor_y += 50;
-  writeln((GFXfont *)&FiraSans, HUMIDITY, &cursor_x, &cursor_y, NULL);
-  cursor_x += 50;
-  writeln((GFXfont *)&FiraSans, "%", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, HUMIDITY, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " %", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
   cursor_y += 50;
-  writeln((GFXfont *)&FiraSans, PRESSURE, &cursor_x, &cursor_y, NULL);
-  cursor_x += 50;
-  writeln((GFXfont *)&FiraSans, "hPa", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, PRESSURE, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " hPa", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
   cursor_y += 50;
-  writeln((GFXfont *)&FiraSans, LIGHT, &cursor_x, &cursor_y, NULL);
-  cursor_x += 50;
-  writeln((GFXfont *)&FiraSans, "lux", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, LIGHT, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " lux", &cursor_x, &cursor_y, framebuffer);
 
 
 
   cursor_x = 100;
   cursor_y += 50;
-  writeln((GFXfont *)&FiraSans, HEATINDEX, &cursor_x, &cursor_y, NULL);
-  cursor_x += 50;
-  writeln((GFXfont *)&FiraSans, "°C", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, HEATINDEX, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
   cursor_y += 50;
 
-  writeln((GFXfont *)&FiraSans, winddirection, &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, winddirection, &cursor_x, &cursor_y, framebuffer);
   cursor_x += 10;
-  writeln((GFXfont *)&FiraSans, "rychlosti", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, "rychlosti", &cursor_x, &cursor_y, framebuffer);
+  cursor_x += 1;
+  writeln((GFXfont *)&FiraSans, WSPEED, &cursor_x, &cursor_y, framebuffer);
   cursor_x += 10;
-  writeln((GFXfont *)&FiraSans, WSPEED, &cursor_x, &cursor_y, NULL);
-  cursor_x += 10;
-  writeln((GFXfont *)&FiraSans, "m/s", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, "m/s", &cursor_x, &cursor_y, framebuffer);
 
 
- /*------------------DOMA-----------------*/
+  /*------------------DOMA-----------------*/
   cursor_x = 50;
-  cursor_y = 470;
-  writeln((GFXfont *)&FiraSans, "Doma", &cursor_x, &cursor_y, NULL);
+  cursor_y = 450;
+  writeln((GFXfont *)&FiraSans, "Doma", &cursor_x, &cursor_y, framebuffer);
 
+  cursor_x = 100;
+  cursor_y += 30;
+  writeln((GFXfont *)&OpenSans10B, "Teplota", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 290;
+
+  writeln((GFXfont *)&OpenSans10B, "Vlhkost", &cursor_x, &cursor_y, framebuffer);
 
 
   cursor_x = 100;
-  cursor_y += 50;
-  writeln((GFXfont *)&FiraSans, temp, &cursor_x, &cursor_y, NULL);
-  cursor_x += 10;
-  writeln((GFXfont *)&FiraSans, "°C", &cursor_x, &cursor_y, NULL);
+  cursor_y = 520;
+  writeln((GFXfont *)&FiraSans, temp, &cursor_x, &cursor_y, framebuffer);
+
+  writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
   cursor_x += 40;
-  writeln((GFXfont *)&FiraSans, hum, &cursor_x, &cursor_y, NULL);
-  cursor_x += 15;
-  writeln((GFXfont *)&FiraSans, "%", &cursor_x, &cursor_y, NULL);
+  writeln((GFXfont *)&FiraSans, hum, &cursor_x, &cursor_y, framebuffer);
+
+  writeln((GFXfont *)&FiraSans, " %", &cursor_x, &cursor_y, framebuffer);
 
 
 
+  epd_draw_grayscale_image(epd_full_screen(), framebuffer);
 
   epd_poweroff_all();
   Hibernace();
@@ -312,8 +331,35 @@ void loop()
 
 }
 
+void DisplayTimeDate() {
+  Rect_t TimeArea = {
+    .x = 600,
+    .y = 0,
+    .width = 350,
+    .height = 150
+  };
+  epd_poweron();
+  epd_clear_area_cycles(TimeArea, 2, 100);
+  cursor_x = 600;
+  cursor_y = 55;
+  writeln((GFXfont *)&FiraSans, bufferdate, &cursor_x, &cursor_y, NULL);
+  cursor_x -= 190;
+  cursor_y += 50;
+  writeln((GFXfont *)&FiraSans, buffertime, &cursor_x, &cursor_y, NULL);
+  epd_poweroff();
+}
 
 
+void printLocalTime()
+{
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+
+}
 void WiFi_Connect() {
   double wificount = 0;
   Serial.println(" ");
@@ -348,6 +394,7 @@ void WiFi_Connect() {
 
 void TimeSync() {
   timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
+  setenv("TZ", TZ_INFO, 1);
   time_t tnow = time(nullptr);
   Serial.print("Čas nyní: ");
   Serial.println(ctime(&tnow));
@@ -356,6 +403,9 @@ void TimeSync() {
   struct tm * timeinfo;
   time(&now);
   timeinfo = localtime(&now);
+  tzset();
+
+  //localtime_r(&now, &timeinfo);
   Year  = ((timeinfo->tm_year) + 1900);
   Month = ((timeinfo->tm_mon) + 1);
   Day = (timeinfo->tm_mday);
@@ -379,10 +429,53 @@ void TimeSync() {
   sprintf(Hours, "%02i", Hour);
   sprintf(Minutes, "%02i", Minute);
   sprintf(Seconds, "%02i", Second);
-  sprintf(buffertime, "%s : %s : %s", Hours, Minutes, Seconds);
+  sprintf(buffertime, "%s : %s", Hours, Minutes);
 
 
 }
+
+void DisplayTime() {
+  setenv("TZ", TZ_INFO, 1);
+  time_t tnow = time(nullptr);
+  Serial.print("Čas nyní: ");
+  Serial.println(ctime(&tnow));
+
+  time_t now;
+  struct tm * timeinfo;
+  time(&now);
+  timeinfo = localtime(&now);
+  tzset();
+
+  //localtime_r(&now, &timeinfo);
+  Year  = ((timeinfo->tm_year) + 1900);
+  Month = ((timeinfo->tm_mon) + 1);
+  Day = (timeinfo->tm_mday);
+  WeekDay = (timeinfo->tm_wday);
+  Hour = (timeinfo->tm_hour);
+  Minute = (timeinfo->tm_min);
+  Second = (timeinfo->tm_sec);
+  Serial.println(Year);
+  Serial.println(Month);
+  Serial.println(Day);
+  Serial.println(WeekDay);
+  Serial.println(Hour);
+  Serial.println(Minute);
+  Serial.println(Second);
+
+
+  sprintf(bufferdate, "%s, %d.%d. %d", daysOfTheWeek[WeekDay], Day, Month, Year);
+
+
+
+  sprintf(Hours, "%02i", Hour);
+  sprintf(Minutes, "%02i", Minute);
+  sprintf(Seconds, "%02i", Second);
+  sprintf(buffertime, "%s : %s", Hours, Minutes);
+
+
+
+}
+
 
 void WiFi_Disconnect() {
   WiFi.disconnect(true);  // Disconnect from the network
@@ -511,7 +604,4 @@ void Get_Data() {
 
   // Close the result
   result.close();
-}
-void TranslateData() {
-
 }
