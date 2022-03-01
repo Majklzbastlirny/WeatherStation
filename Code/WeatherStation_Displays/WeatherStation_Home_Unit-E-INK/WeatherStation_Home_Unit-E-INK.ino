@@ -260,6 +260,7 @@ void setup()
   cursor_x = 100;
   cursor_y = 80;
   writeln((GFXfont *)&OpenSans10B, "Teplota", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&OpenSans10B, "Pocitova teplota", &cursor_x, &cursor_y, framebuffer);
   cursor_y += 40;
   cursor_x = 75;
   writeln((GFXfont *)&FiraSans, TEMPERATURE, &cursor_x, &cursor_y, framebuffer);
@@ -312,7 +313,7 @@ void setup()
   /*------------------DOMA-----------------*/
   cursor_x = 50;
   cursor_y = 450;
-  writeln((GFXfont *)&OpenSans18B, "Doma", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&OpenSans24B, "Doma", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
   cursor_y += 30;
