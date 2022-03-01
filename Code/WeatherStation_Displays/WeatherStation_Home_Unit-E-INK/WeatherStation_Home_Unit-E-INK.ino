@@ -4,10 +4,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "epd_driver.h"
+
 #include "firasans.h"
 #include "opensans10b.h"
 #include "opensans24b.h"
-#include "opensans18b.h"
+#include "MAX.h"
+
 
 #include "esp_adc_cal.h"
 #include <Wire.h>
@@ -25,7 +27,10 @@
 #define DOBA_HIBERNACE 60 //v sekundách
 //#define FAILsleep 30 //v minutách
 RTC_DATA_ATTR byte FAILcount = 0;
-RTC_DATA_ATTR byte FAILsleep = 30;
+RTC_DATA_ATTR byte FAILdata = 0;
+RTC_DATA_ATTR char failsleep[64];
+RTC_DATA_ATTR long FAILsleeptimer = 0;
+byte FAILsleep = 30;  //Čas spánku v minutách
 
 
 //#define INFLUXDB_URL "http://192.168.0.8:8086"
@@ -120,18 +125,53 @@ Rect_t area1 = {
   .width = 300,
   .height = 60
 };
-
+Rect_t ConnectArea = {
+  .x = 225,
+  .y = 0,
+  .width = 375,
+  .height = 60
+};
 
 
 
 void setup()
 {
   Serial.begin(115200);
+  Serial.println(FAILdata);
+  Serial.println(FAILsleeptimer);
   epd_init();
   DisplayTime();
   DisplayTimeDate();
   // Correct the ADC reference voltage
 
+  if (FAILdata = 1 & FAILsleeptimer > 1) {
+    epd_clear_area_cycles(ConnectArea, 3, 250);
+
+    cursor_x = 230;
+    cursor_y = 20;
+    writeln((GFXfont *)&OpenSans10B, "Nepodarilo se pripojit.", &cursor_x, &cursor_y, NULL);
+    cursor_x = 230;
+    cursor_y = 40;
+
+    dtostrf(FAILsleeptimer, 6, 0, failsleep);
+    writeln((GFXfont *)&OpenSans10B, "Za", &cursor_x, &cursor_y, NULL);
+    writeln((GFXfont *)&OpenSans10B, failsleep, &cursor_x, &cursor_y, NULL);
+    writeln((GFXfont *)&OpenSans10B, " minut zkusim znovu", &cursor_x, &cursor_y, NULL);
+    FAILsleeptimer -= 5;
+    esp_sleep_enable_timer_wakeup(5 * 1000000 * 60);
+    epd_poweroff_all();
+    esp_deep_sleep_start();
+  }
+  else {
+  }
+
+  if (FAILdata = 1 & FAILsleeptimer <= 1) {
+    FAILdata = 0;
+
+  }
+  else {
+
+  }
 
 
   uint8_t percentage = 100;
@@ -170,11 +210,13 @@ void setup()
 
 
   epd_poweron();
-  epd_clear();
+
+  epd_poweron();
+  epd_clear_area_cycles(ConnectArea, 3, 250);
   DisplayTimeDate();
-  cursor_x = 0;
-  cursor_y = 35;
-  writeln((GFXfont *)&FiraSans, "Probiha pripojovani k WiFi", &cursor_x, &cursor_y, NULL);
+  cursor_x = 230;
+  cursor_y = 20;
+  writeln((GFXfont *)&OpenSans10B, "Probiha pripojovani k WiFi", &cursor_x, &cursor_y, NULL);
   epd_poweroff();
 
 
@@ -189,19 +231,25 @@ void setup()
   }
   else {
     FAILcount = 0;
-    epd_clear();
-    cursor_x = 0;
-    cursor_y = 35;
-    writeln((GFXfont *)&FiraSans, "Nepodarilo se pripojit.", &cursor_x, &cursor_y, NULL);
-    cursor_x = 0;
-    cursor_y += 40;
-    writeln((GFXfont *)&FiraSans, "Za 30 minut zkusim znovu", &cursor_x, &cursor_y, NULL);
+    epd_clear_area_cycles(ConnectArea, 3, 250);
+    FAILsleeptimer = FAILsleep;
+
+    cursor_x = 230;
+    cursor_y = 20;
+    writeln((GFXfont *)&OpenSans10B, "Nepodarilo se pripojit.", &cursor_x, &cursor_y, NULL);
+    cursor_x = 230;
+    cursor_y = 40;
+
+    dtostrf(FAILsleeptimer, 6, 0, failsleep);
+    writeln((GFXfont *)&OpenSans10B, "Za", &cursor_x, &cursor_y, NULL);
+    writeln((GFXfont *)&OpenSans10B, failsleep, &cursor_x, &cursor_y, NULL);
+    writeln((GFXfont *)&OpenSans10B, " minut zkusim znovu", &cursor_x, &cursor_y, NULL);
 
     DisplayTime();
     DisplayTimeDate();
     epd_poweroff();
-
-    esp_sleep_enable_timer_wakeup(FAILsleep * 1000000 * 60);
+    FAILdata = 1;
+    esp_sleep_enable_timer_wakeup(5 * 1000000 * 60);
     epd_poweroff_all();
     esp_deep_sleep_start();
   }
@@ -248,6 +296,14 @@ void setup()
 
   DisplayTimeDate();
 
+  Rect_t MAXarea = {
+    .x = 625,
+    .y = 120,
+    .width = MAX_width,
+    .height =  MAX_height
+  };
+  epd_copy_to_framebuffer(MAXarea, (uint8_t *) MAX_data, framebuffer);
+
 
 
   /*-----------------VENKU------------------*/
@@ -260,35 +316,56 @@ void setup()
   cursor_x = 100;
   cursor_y = 80;
   writeln((GFXfont *)&OpenSans10B, "Teplota", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 375;
   writeln((GFXfont *)&OpenSans10B, "Pocitova teplota", &cursor_x, &cursor_y, framebuffer);
   cursor_y += 40;
   cursor_x = 75;
   writeln((GFXfont *)&FiraSans, TEMPERATURE, &cursor_x, &cursor_y, framebuffer);
   writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 375;
+  writeln((GFXfont *)&FiraSans, HEATINDEX, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
+
 
   cursor_x = 100;
   cursor_y += 30;
   writeln((GFXfont *)&OpenSans10B, "Vlhkost", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 375;
+  writeln((GFXfont *)&OpenSans10B, "Rosný bod", &cursor_x, &cursor_y, framebuffer);
   cursor_y += 40;
   cursor_x = 80;
   writeln((GFXfont *)&FiraSans, HUMIDITY, &cursor_x, &cursor_y, framebuffer);
   writeln((GFXfont *)&FiraSans, " %", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 375;
+  writeln((GFXfont *)&FiraSans, DEWPOINT, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
   cursor_y += 30;
   writeln((GFXfont *)&OpenSans10B, "Relativni tlak", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 375;
+  writeln((GFXfont *)&OpenSans10B, "Absolutni tlak", &cursor_x, &cursor_y, framebuffer);
+
+
   cursor_y += 40;
   cursor_x = 80;
   writeln((GFXfont *)&FiraSans, PRESSURE, &cursor_x, &cursor_y, framebuffer);
   writeln((GFXfont *)&FiraSans, " hPa", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 375;
+  writeln((GFXfont *)&FiraSans, PRESSURERAW, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " hPa", &cursor_x, &cursor_y, framebuffer);
+
 
   cursor_x = 100;
   cursor_y += 30;
-  writeln((GFXfont *)&OpenSans10B, "Svetlo a UV intenzita", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&OpenSans10B, "Svetlo", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 375;
+  writeln((GFXfont *)&OpenSans10B, "UV intenzita", &cursor_x, &cursor_y, framebuffer);
   cursor_y += 40;
   cursor_x = 80;
   writeln((GFXfont *)&FiraSans, LIGHT, &cursor_x, &cursor_y, framebuffer);
   writeln((GFXfont *)&FiraSans, " lux ", &cursor_x, &cursor_y, framebuffer);
+  cursor_x = 375;
   writeln((GFXfont *)&FiraSans, UV, &cursor_x, &cursor_y, framebuffer);
   writeln((GFXfont *)&FiraSans, " mW/cm2", &cursor_x, &cursor_y, framebuffer);
 
@@ -299,7 +376,7 @@ void setup()
     writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
   */
   cursor_x = 85;
-  cursor_y += 50;
+  cursor_y += 55;
 
   writeln((GFXfont *)&FiraSans, winddirection, &cursor_x, &cursor_y, framebuffer);
   cursor_x += 10;
@@ -333,11 +410,13 @@ void setup()
 
   writeln((GFXfont *)&FiraSans, " %", &cursor_x, &cursor_y, framebuffer);
 
-
+  LastUpdate();
 
   epd_draw_grayscale_image(epd_full_screen(), framebuffer);
 
   epd_poweroff_all();
+  Serial.println(FAILdata);
+  Serial.println(FAILsleeptimer);
   Hibernace();
 }
 
@@ -348,14 +427,14 @@ void loop()
 
 void DisplayTimeDate() {
   Rect_t TimeArea = {
-    .x = 600,
+    .x = 625,
     .y = 0,
-    .width = 350,
-    .height = 150
+    .width = 314,
+    .height = 125
   };
   epd_poweron();
-  epd_clear_area_cycles(TimeArea, 2, 100);
-  cursor_x = 600;
+  epd_clear_area_cycles(TimeArea, 2, 250);
+  cursor_x = 635;
   cursor_y = 55;
   writeln((GFXfont *)&FiraSans, bufferdate, &cursor_x, &cursor_y, NULL);
   cursor_x -= 190;
@@ -503,6 +582,20 @@ void Hibernace() {
   Serial.println("Jdu do režimu hibernace");
   esp_sleep_enable_timer_wakeup(DOBA_HIBERNACE * 1000000);
   esp_deep_sleep_start();
+}
+
+
+void LastUpdate() {
+  cursor_x = 700;
+  cursor_y = 500;
+  writeln((GFXfont *)&OpenSans10B, "Posledni aktualizace:", &cursor_x, &cursor_y, framebuffer);
+  cursor_x -= 225;
+  cursor_y += 25;
+  writeln((GFXfont *)&OpenSans10B, bufferdate, &cursor_x, &cursor_y, framebuffer);
+  cursor_x += 10;
+  writeln((GFXfont *)&OpenSans10B, buffertime, &cursor_x, &cursor_y, framebuffer);
+
+
 }
 
 
