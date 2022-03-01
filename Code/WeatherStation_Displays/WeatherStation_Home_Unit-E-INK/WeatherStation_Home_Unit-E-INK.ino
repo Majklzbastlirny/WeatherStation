@@ -9,7 +9,7 @@
 #include "opensans10b.h"
 #include "opensans24b.h"
 #include "MAX.h"
-
+#include "MAX2.h"
 
 #include "esp_adc_cal.h"
 #include <Wire.h>
@@ -295,15 +295,24 @@ void setup()
   epd_clear();
 
   DisplayTimeDate();
-
+if (Hour > 19 || Hour < 7){
   Rect_t MAXarea = {
-    .x = 625,
+    .x = 600,
     .y = 120,
     .width = MAX_width,
     .height =  MAX_height
   };
   epd_copy_to_framebuffer(MAXarea, (uint8_t *) MAX_data, framebuffer);
-
+}
+else {
+    Rect_t MAX2area = {
+    .x = 600,
+    .y = 120,
+    .width = MAX2_width,
+    .height =  MAX2_height
+  };
+  epd_copy_to_framebuffer(MAX2area, (uint8_t *) MAX2_data, framebuffer);
+}
 
 
   /*-----------------VENKU------------------*/
@@ -430,7 +439,7 @@ void DisplayTimeDate() {
     .x = 625,
     .y = 0,
     .width = 314,
-    .height = 125
+    .height = 115
   };
   epd_poweron();
   epd_clear_area_cycles(TimeArea, 2, 250);
