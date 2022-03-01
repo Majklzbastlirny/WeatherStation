@@ -6,7 +6,8 @@
 #include "epd_driver.h"
 #include "firasans.h"
 #include "opensans10b.h"
-
+#include "opensans24b.h"
+#include "opensans18b.h"
 
 #include "esp_adc_cal.h"
 #include <Wire.h>
@@ -192,10 +193,10 @@ void setup()
     cursor_x = 0;
     cursor_y = 35;
     writeln((GFXfont *)&FiraSans, "Nepodarilo se pripojit.", &cursor_x, &cursor_y, NULL);
-     cursor_x = 0;
+    cursor_x = 0;
     cursor_y += 40;
- writeln((GFXfont *)&FiraSans, "Za 30 minut zkusim znovu", &cursor_x, &cursor_y, NULL);
-    
+    writeln((GFXfont *)&FiraSans, "Za 30 minut zkusim znovu", &cursor_x, &cursor_y, NULL);
+
     DisplayTime();
     DisplayTimeDate();
     epd_poweroff();
@@ -252,38 +253,51 @@ void setup()
   /*-----------------VENKU------------------*/
   cursor_x = 50;
   cursor_y = 55;
-  writeln((GFXfont *)&FiraSans, "Venku", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&OpenSans24B, "Venku", &cursor_x, &cursor_y, framebuffer);
 
 
 
   cursor_x = 100;
-  cursor_y = 100;
+  cursor_y = 80;
+  writeln((GFXfont *)&OpenSans10B, "Teplota", &cursor_x, &cursor_y, framebuffer);
+  cursor_y += 40;
+  cursor_x = 75;
   writeln((GFXfont *)&FiraSans, TEMPERATURE, &cursor_x, &cursor_y, framebuffer);
   writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
-  cursor_y += 50;
+  cursor_y += 30;
+  writeln((GFXfont *)&OpenSans10B, "Vlhkost", &cursor_x, &cursor_y, framebuffer);
+  cursor_y += 40;
+  cursor_x = 80;
   writeln((GFXfont *)&FiraSans, HUMIDITY, &cursor_x, &cursor_y, framebuffer);
   writeln((GFXfont *)&FiraSans, " %", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
-  cursor_y += 50;
+  cursor_y += 30;
+  writeln((GFXfont *)&OpenSans10B, "Relativni tlak", &cursor_x, &cursor_y, framebuffer);
+  cursor_y += 40;
+  cursor_x = 80;
   writeln((GFXfont *)&FiraSans, PRESSURE, &cursor_x, &cursor_y, framebuffer);
   writeln((GFXfont *)&FiraSans, " hPa", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
-  cursor_y += 50;
+  cursor_y += 30;
+  writeln((GFXfont *)&OpenSans10B, "Svetlo a UV intenzita", &cursor_x, &cursor_y, framebuffer);
+  cursor_y += 40;
+  cursor_x = 80;
   writeln((GFXfont *)&FiraSans, LIGHT, &cursor_x, &cursor_y, framebuffer);
-  writeln((GFXfont *)&FiraSans, " lux", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " lux ", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, UV, &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " mW/cm2", &cursor_x, &cursor_y, framebuffer);
 
-
-
-  cursor_x = 100;
-  cursor_y += 50;
-  writeln((GFXfont *)&FiraSans, HEATINDEX, &cursor_x, &cursor_y, framebuffer);
-  writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
-
-  cursor_x = 100;
+  /*
+    cursor_x = 100;
+    cursor_y += 50;
+    writeln((GFXfont *)&FiraSans, HEATINDEX, &cursor_x, &cursor_y, framebuffer);
+    writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
+  */
+  cursor_x = 85;
   cursor_y += 50;
 
   writeln((GFXfont *)&FiraSans, winddirection, &cursor_x, &cursor_y, framebuffer);
@@ -298,7 +312,7 @@ void setup()
   /*------------------DOMA-----------------*/
   cursor_x = 50;
   cursor_y = 450;
-  writeln((GFXfont *)&FiraSans, "Doma", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&OpenSans18B, "Doma", &cursor_x, &cursor_y, framebuffer);
 
   cursor_x = 100;
   cursor_y += 30;
