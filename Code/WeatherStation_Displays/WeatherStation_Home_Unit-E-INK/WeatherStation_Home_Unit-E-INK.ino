@@ -378,7 +378,11 @@ else {
   writeln((GFXfont *)&FiraSans, " lux ", &cursor_x, &cursor_y, framebuffer);
   cursor_x = 375;
   writeln((GFXfont *)&FiraSans, UV, &cursor_x, &cursor_y, framebuffer);
-  writeln((GFXfont *)&FiraSans, " mW/cm2", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&FiraSans, " mW/cm", &cursor_x, &cursor_y, framebuffer);  
+    cursor_y -= 15;
+
+  writeln((GFXfont *)&OpenSans10B, "2", &cursor_x, &cursor_y, framebuffer);
+
 
   /*
     cursor_x = 100;
@@ -387,7 +391,7 @@ else {
     writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
   */
   cursor_x = 85;
-  cursor_y += 55;
+  cursor_y += 70;
 
   writeln((GFXfont *)&FiraSans, winddirection, &cursor_x, &cursor_y, framebuffer);
   cursor_x += 10;
@@ -448,7 +452,7 @@ void DisplayTimeDate() {
   cursor_x = 635;
   cursor_y = 55;
   writeln((GFXfont *)&FiraSans, bufferdate, &cursor_x, &cursor_y, NULL);
-  cursor_x -= 190;
+  cursor_x -= 240;
   cursor_y += 50;
   writeln((GFXfont *)&FiraSans, buffertime, &cursor_x, &cursor_y, NULL);
   epd_poweroff();
@@ -534,7 +538,7 @@ void TimeSync() {
   sprintf(Hours, "%02i", Hour);
   sprintf(Minutes, "%02i", Minute);
   sprintf(Seconds, "%02i", Second);
-  sprintf(buffertime, "%s : %s", Hours, Minutes);
+  sprintf(buffertime, "%s : %s : %s", Hours, Minutes, Seconds);
 
 
 }
@@ -575,7 +579,7 @@ void DisplayTime() {
   sprintf(Hours, "%02i", Hour);
   sprintf(Minutes, "%02i", Minute);
   sprintf(Seconds, "%02i", Second);
-  sprintf(buffertime, "%s : %s", Hours, Minutes);
+  sprintf(buffertime, "%s : %s : %s", Hours, Minutes, Seconds);
 
 
 
@@ -600,7 +604,7 @@ void LastUpdate() {
   cursor_x = 700;
   cursor_y = 500;
   writeln((GFXfont *)&OpenSans10B, "Posledni aktualizace:", &cursor_x, &cursor_y, framebuffer);
-  cursor_x -= 225;
+  cursor_x -= 250;
   cursor_y += 25;
   writeln((GFXfont *)&OpenSans10B, bufferdate, &cursor_x, &cursor_y, framebuffer);
   cursor_x += 10;
