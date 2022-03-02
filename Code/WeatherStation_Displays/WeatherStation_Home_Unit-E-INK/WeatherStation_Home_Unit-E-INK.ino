@@ -226,7 +226,7 @@ void setup()
   Serial.print("Joining failed ");
   Serial.print(FAILcount);
   Serial.println(" times");
-  if (FAILcount < 10) {
+  if (FAILcount < 5) {
 
   }
   else {
@@ -249,6 +249,8 @@ void setup()
     DisplayTimeDate();
     epd_poweroff();
     FAILdata = 1;
+        FAILsleeptimer -= 5;
+
     esp_sleep_enable_timer_wakeup(5 * 1000000 * 60);
     epd_poweroff_all();
     esp_deep_sleep_start();
@@ -338,7 +340,7 @@ else {
 
   cursor_x = 100;
   cursor_y += 30;
-  writeln((GFXfont *)&OpenSans10B, "Vlhkost", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&OpenSans10B, "Relativni vlhkost", &cursor_x, &cursor_y, framebuffer);
   cursor_x = 375;
   writeln((GFXfont *)&OpenSans10B, "Rosný bod", &cursor_x, &cursor_y, framebuffer);
   cursor_y += 40;
@@ -367,7 +369,7 @@ else {
 
   cursor_x = 100;
   cursor_y += 30;
-  writeln((GFXfont *)&OpenSans10B, "Svetlo", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&OpenSans10B, "Intenzita osvetleni", &cursor_x, &cursor_y, framebuffer);
   cursor_x = 375;
   writeln((GFXfont *)&OpenSans10B, "UV intenzita", &cursor_x, &cursor_y, framebuffer);
   cursor_y += 40;
@@ -406,7 +408,7 @@ else {
   writeln((GFXfont *)&OpenSans10B, "Teplota", &cursor_x, &cursor_y, framebuffer);
   cursor_x = 290;
 
-  writeln((GFXfont *)&OpenSans10B, "Vlhkost", &cursor_x, &cursor_y, framebuffer);
+  writeln((GFXfont *)&OpenSans10B, "Relativni vlhkost", &cursor_x, &cursor_y, framebuffer);
 
 
   cursor_x = 100;
@@ -642,7 +644,7 @@ void Get_Data() {
     }
     else if (meas == "Light") {
       light = value;
-      dtostrf(light, 8, 2, LIGHT);
+      dtostrf(light, 8, 1, LIGHT);
     }
     else if (meas == "Precipitation") {
       precipitation = value;
