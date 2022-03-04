@@ -245,7 +245,7 @@ void setup()   {
   display.println("Vitr");
   display.setCursor(0, 40);
   display.setFont();
-  display.println("Rychlos  Smer (odkud)");
+  display.println("Rychlost  Smer (odkud)");
   display.setFont(&FreeSans9pt7b);
   display.setCursor(0, 62);
   display.print(wspeed);
