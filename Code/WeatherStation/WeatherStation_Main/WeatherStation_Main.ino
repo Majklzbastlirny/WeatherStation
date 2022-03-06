@@ -95,8 +95,8 @@ float uvIntensity = 0;
 float outputVoltage = 0;
 
 //Proměnné k senzoru vlhkosti a teploty DHT22
-float hd = 0;
-float td = 0;
+RTC_DATA_ATTR float hd = 0;
+RTC_DATA_ATTR float td = 0;
 #define DHTPIN 23 //4
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
