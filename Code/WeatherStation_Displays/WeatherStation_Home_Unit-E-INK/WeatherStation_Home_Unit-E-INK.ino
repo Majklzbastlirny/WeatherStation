@@ -24,7 +24,7 @@
 
 #define I2C_SDA 14
 #define I2C_SCL 15
-#define DOBA_HIBERNACE 60 //v sekundách
+#define DOBA_HIBERNACE 120 //v sekundách
 //#define FAILsleep 30 //v minutách
 RTC_DATA_ATTR byte FAILcount = 0;
 RTC_DATA_ATTR byte FAILdata = 0;
@@ -442,14 +442,14 @@ void loop()
 
 void DisplayTimeDate() {
   Rect_t TimeArea = {
-    .x = 625,
+    .x = 580 ,
     .y = 0,
-    .width = 314,
+    .width = 360,
     .height = 115
   };
   epd_poweron();
   epd_clear_area_cycles(TimeArea, 2, 250);
-  cursor_x = 635;
+  cursor_x = 580;
   cursor_y = 55;
   writeln((GFXfont *)&FiraSans, bufferdate, &cursor_x, &cursor_y, NULL);
   cursor_x -= 240;
@@ -601,7 +601,7 @@ void Hibernace() {
 
 
 void LastUpdate() {
-  cursor_x = 700;
+  cursor_x = 650;
   cursor_y = 500;
   writeln((GFXfont *)&OpenSans10B, "Posledni aktualizace:", &cursor_x, &cursor_y, framebuffer);
   cursor_x -= 250;
