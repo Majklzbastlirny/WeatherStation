@@ -95,8 +95,8 @@ float uvIntensity = 0;
 float outputVoltage = 0;
 
 //Proměnné k senzoru vlhkosti a teploty DHT22
-RTC_DATA_ATTR float hd = 0;
-RTC_DATA_ATTR float td = 0;
+float hd = 0;
+float td = 0;
 #define DHTPIN 23 //4
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
@@ -118,7 +118,7 @@ double T, P, p0;
 
 //Proměnné k vyhřívacímu systému
 RTC_DATA_ATTR bool HeatOn = 0;
-int MinTemp = -1;
+int MinTemp = -5;
 #define HeatPin 4
 bool Heatin = 0;
 
@@ -131,12 +131,18 @@ float voltage = 0;
 short wificount = 0;
 
 float precipitation = 0;
+
+
+
+
+
 /*************************** Vlastní kód ************************************/
 
 
 
 void setup() {
-  Wire.begin();
+  // Wire.setClock(5000);
+  Wire.begin(21, 22);
   Serial.begin(115200);
 
   /******** Nastavení pinů ***********/
@@ -171,7 +177,7 @@ void setup() {
   delay(2000);
   unsigned status;
   status = bmp.begin(0x76, 0x58);
-  
+
   dht.begin();
   delay(250);
 
@@ -183,15 +189,13 @@ void loop() {
   digitalWrite(LEDDIAG, LOW);
   delay(2000);
   Sprintln("");
-    ReadLight();
-
-  ReadSpeed();
+  ReadLight();
   ReadBattery();
   ReadBMP();
   MeasureUV();
   ReadAngle();
   ReadDHT();
- 
+  ReadSpeed();
 
   digitalWrite(SensorPWR, LOW);
   WiFi_Connect();
@@ -212,45 +216,22 @@ void loop() {
 }
 
 
-void MQTT_Connect() {
-  int8_t ret;
-  digitalWrite(LEDDIAG, HIGH );
 
-  // Stop if already connected.
-  if (mqtt.connected()) {
-    return;
-  }
+/****************************Všechny zbytky kódů**********************************/
 
-  Sprintln("Připojuji se k MQTT serveru ");
 
-  uint8_t retries = 3;
-  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
-    Sprintln(mqtt.connectErrorString(ret));
-    Sprintln("Nepodařilo se mi připojit k MQTT serveru. Zkusím to znovu za 5 sekund.");
-    mqtt.disconnect();
-    delay(5000);  // wait 5 seconds
-    retries--;
-    if (retries == 0) {
-      // basically die and wait for user to reset me
-      digitalWrite(SensorPWR, LOW);
-      ESP.restart();
-    }
-  }
-  Sprintln("Úspěšně připojeno k MQTT serveru!");
+//kód pro čtení intenzity osvětlení ze senzoru BH1750
+void ReadLight() {
+  lightMeter.begin();
+  delay(200);
+  lux = lightMeter.readLightLevel();
+
+  Sprint("Světelnost: ");
+  Sprint(lux);
+  Sprintln(" lux");
 }
 
-void Hibernace() {
-  digitalWrite(SensorPWR, LOW);
-
-  Sprintln("Jdu do režimu hibernace");
-  esp_sleep_enable_timer_wakeup(DOBA_HIBERNACE * 1000000);
-  esp_deep_sleep_start();
-}
-
-void ISR() {
-  pulses++;
-}
-
+//Kód pro měření napětí na baterii
 void ReadBattery() {
   voltage = (((analogRead(voltmeas) * 8.158) / 4095) + 0.13);
   Sprint("Napětí na baterce: ");
@@ -259,6 +240,66 @@ void ReadBattery() {
   delay(10);
 }
 
+//Kód pro čtení tlaku a teploty ze senzoru BMP280
+void ReadBMP() {
+  Sprint("Nadmořská výška stanice: ");
+  Sprint(NadmVys);
+  Sprintln(" m.n.m.");
+
+  Sprint(F("Teplota: "));
+  T = bmp.readTemperature();
+  Sprint(T);
+  Sprint(" *C = ");
+  Tf = ((T * 1.8) + 32);
+  Sprint(Tf);
+  Sprintln(" °F");
+
+  Sprint(F("Absolutní tlak: "));
+  P = (bmp.readPressure() / 100);
+  Sprint(P);
+  Sprintln(" hPa");
+
+  Sprint(F("Relativní tlak: "));
+  delay(5);
+  p0 = (((bmp.readPressure()) / pow((1 - ((float)(NadmVys)) / 44330), 5.255)) / 100.0);
+  Sprint(p0);
+  Sprintln(" hPa");
+
+  delay(1);
+
+  if (T < MinTemp) {
+    digitalWrite(HeatPin, 1);
+    Heatin = 1;
+  }
+  else if (T >= MinTemp) {
+    digitalWrite(HeatPin, 0);
+    Heatin = 0;
+  }
+  else {}
+}
+
+//Kód pro měření UV intenzity senzorem ML8511
+void MeasureUV() {
+  uvLevel = averageAnalogRead(UVOUT);
+  refLevel = averageAnalogRead(REF_3V3);
+
+  //Use the 3.3V power pin as a reference to get a very accurate output value from sensor
+  outputVoltage = 3.3 / 4095 * uvLevel;   // adjust outputVoltage to actual voltage in case you read negative values.
+
+  uvIntensity = mapfloat(outputVoltage, 0.99, 2.8, 0.0, 15.0); //Convert the voltage to a UV intensity level
+  if (uvIntensity < 0) {
+    uvIntensity = 0;
+  }
+  else {
+    uvIntensity = uvIntensity;
+  }
+
+  Sprint("UV intenzita (mW/cm^2): ");
+  Sprint(uvIntensity);
+  Sprintln("");
+}
+
+//Kód pro překlad jednocestného Grayova kódu na úhel
 void ReadAngle() {
   if (D1 ==  1 && D2 == 0  && D3 == 0 && D4 == 0 && D5 == 0 ) {
     wv = 0;
@@ -370,114 +411,19 @@ void ReadAngle() {
   Sprintln("");
 }
 
-void ReadLight() {
- // lightMeter.begin();
-  delay(200);
-  lux = lightMeter.readLightLevel();
-  
-  Sprint("Světelnost: ");
-  Sprint(lux);
-  Sprintln(" lux");
-}
-
-void ReadBMP() {
-  Sprint("Nadmořská výška stanice: ");
-  Sprint(NadmVys);
-  Sprintln(" m.n.m.");
-
-  Sprint(F("Teplota: "));
-  T = bmp.readTemperature();
-  Sprint(T);
-  Sprint(" *C = ");
-  Tf = ((T * 1.8) + 32);
-  Sprint(Tf);
-  Sprintln(" °F");
-
-  Sprint(F("Absolutní tlak: "));
-  P = (bmp.readPressure() / 100);
-  Sprint(P);
-  Sprintln(" hPa");
-
-  Sprint(F("Relativní tlak: "));
-  delay(5);
-  p0 = (((bmp.readPressure()) / pow((1 - ((float)(NadmVys)) / 44330), 5.255)) / 100.0);
-  Sprint(p0);
-  Sprintln(" hPa");
-
-  delay(1);
-
-  if (T < MinTemp) {
-    digitalWrite(HeatPin, 1);
-    Heatin = 1;
-  }
-  else if (T >= MinTemp) {
-    digitalWrite(HeatPin, 0);
-    Heatin = 0;
-  }
-  else {}
-}
-void WiFi_Connect() {
-  Sprint("Připojuji se k: ");
-  Sprintln(WLAN_SSID);
-  WiFi.begin(WLAN_SSID, WLAN_PASS);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(400);
-    Sprint(".");
-    wificount++;
-    delay(100);
-    if (wificount < 40) {
-
-    }
-    else {
-      digitalWrite(SensorPWR, LOW);
-      ESP.restart();
-    }
-  }
-  Sprintln("Uspěšně připojeno");
-  Sprint("Moje IP adresa: ");
-  Sprintln(WiFi.localIP());
-  long rssi = WiFi.RSSI();
-  Sprint("Síla WiFi signálu je: ");
-  Sprint(rssi);
-  Sprintln(" dBm");
-
-}
-
-void WiFi_Disconnect() {
-  WiFi.disconnect(true);  // Disconnect from the network
-  WiFi.mode(WIFI_OFF);    // Switch WiFi off
-  digitalWrite(LEDDIAG, LOW);
-}
-
-void MeasureUV() {
-  uvLevel = averageAnalogRead(UVOUT);
-  refLevel = averageAnalogRead(REF_3V3);
-
-  //Use the 3.3V power pin as a reference to get a very accurate output value from sensor
-  outputVoltage = 3.3 / 4095 * uvLevel;   // adjust outputVoltage to actual voltage in case you read negative values.
-
-  uvIntensity = mapfloat(outputVoltage, 0.99, 2.8, 0.0, 15.0); //Convert the voltage to a UV intensity level
-  if (uvIntensity < 0) {
-    uvIntensity = 0;
-  }
-  else {
-    uvIntensity = uvIntensity;
-  }
-
-  Sprint("UV intenzita (mW/cm^2): ");
-  Sprint(uvIntensity);
-  Sprintln("");
-}
-
+//Kód pro čtení teploty a vlhkosti ze senzoru DHT22
 void ReadDHT() {
-  hd = dht.readHumidity();
+
   td = (dht.readTemperature());
+  hd = dht.readHumidity();
   delay(100);
 
   if (isnan(hd) || isnan(td)) {
     Sprintln(F("Failed to read from DHT sensor!"));
   }
-  else {}
+  else {
+
+  }
 
   Sprint(F("Vlhkost: "));
   Sprint(hd);
@@ -511,6 +457,7 @@ void ReadDHT() {
 
 }
 
+//Kód pro měření rychlosti větru
 void ReadSpeed() {
   attachInterrupt(AnemoPIN, ISR, FALLING);
   delay(AnemoTime);
@@ -524,6 +471,66 @@ void ReadSpeed() {
   Sprintln(" km/h");
 }
 
+void ISR() {
+  pulses++;
+}
+
+//Kód pro připojení k WiFi síti
+void WiFi_Connect() {
+  Sprint("Připojuji se k: ");
+  Sprintln(WLAN_SSID);
+  WiFi.begin(WLAN_SSID, WLAN_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(400);
+    Sprint(".");
+    wificount++;
+    delay(100);
+    if (wificount < 40) {
+
+    }
+    else {
+      digitalWrite(SensorPWR, LOW);
+      ESP.restart();
+    }
+  }
+  Sprintln("Uspěšně připojeno");
+  Sprint("Moje IP adresa: ");
+  Sprintln(WiFi.localIP());
+  long rssi = WiFi.RSSI();
+  Sprint("Síla WiFi signálu je: ");
+  Sprint(rssi);
+  Sprintln(" dBm");
+}
+
+//Kód pro připojení k MQTT serveru
+void MQTT_Connect() {
+  int8_t ret;
+  digitalWrite(LEDDIAG, HIGH );
+
+  // Stop if already connected.
+  if (mqtt.connected()) {
+    return;
+  }
+
+  Sprintln("Připojuji se k MQTT serveru ");
+
+  uint8_t retries = 6;
+  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
+    Sprintln(mqtt.connectErrorString(ret));
+    Sprintln("Nepodařilo se mi připojit k MQTT serveru. Zkusím to znovu za 5 sekund.");
+    mqtt.disconnect();
+    delay(5000);  // wait 5 seconds
+    retries--;
+    if (retries == 0) {
+      // basically die and wait for user to reset me
+      digitalWrite(SensorPWR, LOW);
+      ESP.restart();
+    }
+  }
+  Sprintln("Úspěšně připojeno k MQTT serveru!");
+}
+
+//Kód pro odeslání dat na MQTT server
 void PublishMQTT() {
 
   Sprintln(F("Probíhá odesílání dat na server"));
@@ -643,7 +650,7 @@ void PublishMQTT() {
   }
   delay(150);
 
-  Sprint(F("Probíhá ůodesílání srážek:"));
+  Sprint(F("Probíhá odesílání srážek:"));
   if (! Precipitation.publish(precipitation)) {
     Sprintln(F(" Failed"));
   } else {
@@ -652,6 +659,24 @@ void PublishMQTT() {
   delay(150);
 }
 
+//Kód pro odpojení od WiFi sítě
+void WiFi_Disconnect() {
+  WiFi.disconnect(true);  // Disconnect from the network
+  WiFi.mode(WIFI_OFF);    // Switch WiFi off
+  digitalWrite(LEDDIAG, LOW);
+}
+
+//Kód pro přechodu mikrokontroleru do režimu hibernace
+void Hibernace() {
+  digitalWrite(SensorPWR, LOW);
+
+  Sprintln("Jdu do režimu hibernace");
+  esp_sleep_enable_timer_wakeup(DOBA_HIBERNACE * 1000000);
+  esp_deep_sleep_start();
+}
+
+
+//Dodatečný kód pro čtení UV intenzity
 int averageAnalogRead( int pinToRead)
 {
   byte numberOfReadings = 8;
