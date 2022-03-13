@@ -1,0 +1,2 @@
+150mA při connect, 290 microamps deep sleep //EINK@4volts
+130ma Measurement,90mA odesílání dat a join wifi 10mA idle //stanice @6,3Volts
