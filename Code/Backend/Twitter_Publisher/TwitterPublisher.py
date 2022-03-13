@@ -76,6 +76,10 @@ elif WindDir > 292.5 and WindDir < 337.5 :
 else:
       WindDirS = "ze severu"
     
+if Speed == 0:
+    Wind = "Nyní nefouká"
+else:
+     Wind = "Fouká " + str(WindDirS) + " rychlostí " + str(Speed) + " m/s"
 
 
 def main():
@@ -96,7 +100,7 @@ def main():
             )
     api = tweepy.API(auth)
  
-    tweet = "Nyní je " + str(current_time) + "\n\n" + "Teplota: " + str(Temperature) + " °C.\n" + "Relativní vlhkost: " + str(Humidity) + " %.\n" + "Relativní tlak: " + str(Pressure) + " hPa.\n" + "Rychlost větru: " + str(Speed) + " m/s.\n" + "Fouká " + str(WindDirS) + ".\n" + "Srážky za hodinu: " + str(Precipitation) + " mm.\n" + "Větrný chlad: " + str(WindChill) + " °C.\n" + "UV: " + str(UV) + " mW/cm².\n" + "Světlost: " + str(Light) + " lux.\n" + "Pocitová teplota: " + str(HeatIndex) + " °C.\n" + "Rosný bod: " + str(DewPoint) + " °C."
+    tweet = "Nyní je " + str(current_time) + "\n\n" + "Teplota: " + str(Temperature) + " °C\n"  + "Pocitová teplota: " + str(HeatIndex) + " °C\n" + "Rosný bod: " + str(DewPoint) + " °C\n\n" + "Relativní vlhkost: " + str(Humidity) + " %\n" + "Relativní tlak: " + str(Pressure) + " hPa\n\n" + str(Wind) + "\n\n" + "Intenzita osvětlení: " + str(Light) + " lux\n" + "UV intenzita: " + str(UV) + " mW/cm²\n\n" + "Srážky za hodinu: " + str(Precipitation) + " mm\n"
     status = api.update_status(status=tweet)
  
 if __name__ == "__main__":
