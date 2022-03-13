@@ -249,7 +249,7 @@ void setup()
     DisplayTimeDate();
     epd_poweroff();
     FAILdata = 1;
-        FAILsleeptimer -= 5;
+    FAILsleeptimer -= 5;
 
     esp_sleep_enable_timer_wakeup(5 * 1000000 * 60);
     epd_poweroff_all();
@@ -297,24 +297,24 @@ void setup()
   epd_clear();
 
   DisplayTimeDate();
-if (Hour > 19 || Hour < 7){
-  Rect_t MAXarea = {
-    .x = 600,
-    .y = 120,
-    .width = MAX_width,
-    .height =  MAX_height
-  };
-  epd_copy_to_framebuffer(MAXarea, (uint8_t *) MAX_data, framebuffer);
-}
-else {
+  if (Hour > 19 || Hour < 7) {
+    Rect_t MAXarea = {
+      .x = 600,
+      .y = 120,
+      .width = MAX_width,
+      .height =  MAX_height
+    };
+    epd_copy_to_framebuffer(MAXarea, (uint8_t *) MAX_data, framebuffer);
+  }
+  else {
     Rect_t MAX2area = {
-    .x = 600,
-    .y = 120,
-    .width = MAX2_width,
-    .height =  MAX2_height
-  };
-  epd_copy_to_framebuffer(MAX2area, (uint8_t *) MAX2_data, framebuffer);
-}
+      .x = 600,
+      .y = 120,
+      .width = MAX2_width,
+      .height =  MAX2_height
+    };
+    epd_copy_to_framebuffer(MAX2area, (uint8_t *) MAX2_data, framebuffer);
+  }
 
 
   /*-----------------VENKU------------------*/
@@ -378,8 +378,8 @@ else {
   writeln((GFXfont *)&FiraSans, " lux ", &cursor_x, &cursor_y, framebuffer);
   cursor_x = 375;
   writeln((GFXfont *)&FiraSans, UV, &cursor_x, &cursor_y, framebuffer);
-  writeln((GFXfont *)&FiraSans, " mW/cm", &cursor_x, &cursor_y, framebuffer);  
-    cursor_y -= 15;
+  writeln((GFXfont *)&FiraSans, " mW/cm", &cursor_x, &cursor_y, framebuffer);
+  cursor_y -= 15;
 
   writeln((GFXfont *)&OpenSans10B, "2", &cursor_x, &cursor_y, framebuffer);
 
@@ -392,14 +392,18 @@ else {
   */
   cursor_x = 85;
   cursor_y += 70;
-
-  writeln((GFXfont *)&FiraSans, winddirection, &cursor_x, &cursor_y, framebuffer);
-  cursor_x += 10;
-  writeln((GFXfont *)&FiraSans, "rychlosti", &cursor_x, &cursor_y, framebuffer);
-  cursor_x += 1;
-  writeln((GFXfont *)&FiraSans, WSPEED, &cursor_x, &cursor_y, framebuffer);
-  cursor_x += 10;
-  writeln((GFXfont *)&FiraSans, "m/s", &cursor_x, &cursor_y, framebuffer);
+  if (wspeed == 0) {
+    writeln((GFXfont *)&FiraSans, "Nyni nefouka", &cursor_x, &cursor_y, framebuffer);
+  }
+  else {
+    writeln((GFXfont *)&FiraSans, winddirection, &cursor_x, &cursor_y, framebuffer);
+    cursor_x += 10;
+    writeln((GFXfont *)&FiraSans, "rychlosti", &cursor_x, &cursor_y, framebuffer);
+    cursor_x += 1;
+    writeln((GFXfont *)&FiraSans, WSPEED, &cursor_x, &cursor_y, framebuffer);
+    cursor_x += 10;
+    writeln((GFXfont *)&FiraSans, "m/s", &cursor_x, &cursor_y, framebuffer);
+  }
 
 
   /*------------------DOMA-----------------*/
