@@ -239,7 +239,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "Home_Unit_OLED.kicad_pro",
+    "filename": "WeatherStation.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -318,7 +318,7 @@
   },
   "sheets": [
     [
-      "4f815b39-95e8-4646-be72-491ae6534ad7",
+      "eaef1172-3351-417c-bfc4-74a598f141cb",
       ""
     ]
   ],

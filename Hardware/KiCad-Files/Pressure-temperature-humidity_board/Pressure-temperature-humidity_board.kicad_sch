@@ -605,7 +605,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x12") (at 173.99 68.58 90) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 02589cab-fb2f-45e1-96a6-85b1388507f5)
-    (property "Reference" "J2" (id 0) (at 175.26 62.23 90))
+    (property "Reference" "X2" (id 0) (at 175.26 62.23 90))
     (property "Value" "Conn_01x12" (id 1) (at 175.26 64.77 90))
     (property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal" (id 2) (at 173.99 68.58 0)
       (effects (font (size 1.27 1.27)) hide)
@@ -666,7 +666,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x12") (at 142.24 68.58 90) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 912026ef-94bf-45fc-91c6-d43c83243d53)
-    (property "Reference" "J1" (id 0) (at 143.51 62.23 90))
+    (property "Reference" "X1" (id 0) (at 143.51 62.23 90))
     (property "Value" "Conn_01x12" (id 1) (at 143.51 64.77 90))
     (property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal" (id 2) (at 142.24 68.58 0)
       (effects (font (size 1.27 1.27)) hide)
@@ -759,14 +759,14 @@
     (path "/7c15b0ab-bf9f-4257-874a-a594a0d90185"
       (reference "C1") (unit 1) (value "100u") (footprint "Capacitor_THT:C_Disc_D12.5mm_W5.0mm_P7.50mm")
     )
-    (path "/912026ef-94bf-45fc-91c6-d43c83243d53"
-      (reference "J1") (unit 1) (value "Conn_01x12") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal")
-    )
-    (path "/02589cab-fb2f-45e1-96a6-85b1388507f5"
-      (reference "J2") (unit 1) (value "Conn_01x12") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal")
-    )
     (path "/cdf5c80c-085c-4487-bdb9-69cd3ed92afb"
       (reference "R1") (unit 1) (value "10k") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+    )
+    (path "/912026ef-94bf-45fc-91c6-d43c83243d53"
+      (reference "X1") (unit 1) (value "Conn_01x12") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal")
+    )
+    (path "/02589cab-fb2f-45e1-96a6-85b1388507f5"
+      (reference "X2") (unit 1) (value "Conn_01x12") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal")
     )
   )
 )
