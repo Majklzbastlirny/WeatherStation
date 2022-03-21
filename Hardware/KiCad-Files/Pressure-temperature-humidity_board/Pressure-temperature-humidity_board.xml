@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>C:\Users\Michal\Documents\GitHub\WeatherStation\Hardware\KiCad-Files\Pressure-temperature-humidity_board\Pressure-temperature-humidity_board.kicad_sch</source>
+    <date>21.03.2022 10:10:33</date>
+    <tool>Eeschema (6.0.0)</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>Deska pro měření tlaku, teploty a vlhkosti</title>
+        <company>Michal Basler</company>
+        <rev>1.1</rev>
+        <date>2022-03-02</date>
+        <source>Pressure-temperature-humidity_board.kicad_sch</source>
+        <comment number="1" value="Maturitní práce 2021/22"/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="A1">
+      <value>BMP(E)_180(280)</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical</footprint>
+      <libsource lib="BMP(E)_180(280)" part="BMP(E)_180(280)" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Pressure-temperature-humidity_board.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>950613d2-bc79-4c2c-8470-5fcd6bd4be2b</tstamps>
+    </comp>
+    <comp ref="A2">
+      <value>DHT22</value>
+      <footprint>Sensor:Aosong_DHT11_5.5x12.0_P2.54mm</footprint>
+      <libsource lib="DHT22" part="DHT22" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Pressure-temperature-humidity_board.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>3778c7e5-e66e-400e-9976-8b6fddba99e8</tstamps>
+    </comp>
+    <comp ref="C1">
+      <value>100u</value>
+      <footprint>Capacitor_THT:C_Disc_D12.5mm_W5.0mm_P7.50mm</footprint>
+      <libsource lib="Device" part="C_Polarized" description="Polarized capacitor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Pressure-temperature-humidity_board.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>7c15b0ab-bf9f-4257-874a-a594a0d90185</tstamps>
+    </comp>
+    <comp ref="R1">
+      <value>10k</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Pressure-temperature-humidity_board.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>cdf5c80c-085c-4487-bdb9-69cd3ed92afb</tstamps>
+    </comp>
+    <comp ref="X1">
+      <value>Conn_01x12</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal</footprint>
+      <libsource lib="Connector_Generic" part="Conn_01x12" description="Generic connector, single row, 01x12, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Pressure-temperature-humidity_board.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>912026ef-94bf-45fc-91c6-d43c83243d53</tstamps>
+    </comp>
+    <comp ref="X2">
+      <value>Conn_01x12</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal</footprint>
+      <libsource lib="Connector_Generic" part="Conn_01x12" description="Generic connector, single row, 01x12, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Pressure-temperature-humidity_board.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>02589cab-fb2f-45e1-96a6-85b1388507f5</tstamps>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="BMP(E)_180(280)" part="BMP(E)_180(280)">
+      <fields>
+        <field name="Reference">A</field>
+        <field name="Value">BMP(E)_180(280)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VIN" type="power_in"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="SCL" type="bidirectional"/>
+        <pin num="4" name="SDA" type="bidirectional"/>
+        <pin num="5" name="SCB" type="bidirectional"/>
+        <pin num="6" name="SDO" type="bidirectional"/>
+      </pins>
+    </libpart>
+    <libpart lib="Connector_Generic" part="Conn_01x12">
+      <description>Generic connector, single row, 01x12, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x12</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+        <pin num="3" name="Pin_3" type="passive"/>
+        <pin num="4" name="Pin_4" type="passive"/>
+        <pin num="5" name="Pin_5" type="passive"/>
+        <pin num="6" name="Pin_6" type="passive"/>
+        <pin num="7" name="Pin_7" type="passive"/>
+        <pin num="8" name="Pin_8" type="passive"/>
+        <pin num="9" name="Pin_9" type="passive"/>
+        <pin num="10" name="Pin_10" type="passive"/>
+        <pin num="11" name="Pin_11" type="passive"/>
+        <pin num="12" name="Pin_12" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="DHT22" part="DHT22">
+      <fields>
+        <field name="Reference">A</field>
+        <field name="Value">DHT22</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VCC" type="power_in"/>
+        <pin num="2" name="DATA" type="bidirectional"/>
+        <pin num="3" name="N/C" type="no_connect"/>
+        <pin num="4" name="GND" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C_Polarized">
+      <description>Polarized capacitor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>CP_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_Polarized</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="BMP(E)_180(280)">
+      <uri>C:/Users/Michal/Documents/KiCad/6.0/symbols/BMP(E)_180(280).kicad_sym</uri>
+    </library>
+    <library logical="Connector_Generic">
+      <uri>C:\Program Files\KiCad\6.0\share\kicad\symbols\/Connector_Generic.kicad_sym</uri>
+    </library>
+    <library logical="DHT22">
+      <uri>C:/Users/Michal/Documents/KiCad/6.0/symbols/DHT22.kicad_sym</uri>
+    </library>
+    <library logical="Device">
+      <uri>C:\Program Files\KiCad\6.0\share\kicad\symbols\/Device.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="GND">
+      <node ref="A1" pin="2" pinfunction="GND" pintype="power_in"/>
+      <node ref="A2" pin="4" pinfunction="GND" pintype="power_in"/>
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="X1" pin="3" pinfunction="Pin_3" pintype="passive"/>
+      <node ref="X2" pin="3" pinfunction="Pin_3" pintype="passive"/>
+    </net>
+    <net code="2" name="Net-(A1-Pad1)">
+      <node ref="A1" pin="1" pinfunction="VIN" pintype="power_in"/>
+      <node ref="A2" pin="1" pinfunction="VCC" pintype="power_in"/>
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+      <node ref="X1" pin="1" pinfunction="Pin_1" pintype="passive"/>
+      <node ref="X2" pin="1" pinfunction="Pin_1" pintype="passive"/>
+    </net>
+    <net code="3" name="Net-(A1-Pad3)">
+      <node ref="A1" pin="3" pinfunction="SCL" pintype="bidirectional"/>
+      <node ref="X1" pin="7" pinfunction="Pin_7" pintype="passive"/>
+      <node ref="X2" pin="10" pinfunction="Pin_10" pintype="passive"/>
+    </net>
+    <net code="4" name="Net-(A1-Pad4)">
+      <node ref="A1" pin="4" pinfunction="SDA" pintype="bidirectional"/>
+      <node ref="X1" pin="6" pinfunction="Pin_6" pintype="passive"/>
+      <node ref="X2" pin="8" pinfunction="Pin_8" pintype="passive"/>
+    </net>
+    <net code="5" name="Net-(A2-Pad2)">
+      <node ref="A2" pin="2" pinfunction="DATA" pintype="bidirectional"/>
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="X1" pin="8" pinfunction="Pin_8" pintype="passive"/>
+    </net>
+    <net code="6" name="Net-(X1-Pad2)">
+      <node ref="X1" pin="2" pinfunction="Pin_2" pintype="passive"/>
+      <node ref="X2" pin="2" pinfunction="Pin_2" pintype="passive"/>
+    </net>
+    <net code="7" name="Net-(X1-Pad9)">
+      <node ref="X1" pin="9" pinfunction="Pin_9" pintype="passive"/>
+      <node ref="X2" pin="6" pinfunction="Pin_6" pintype="passive"/>
+    </net>
+    <net code="8" name="unconnected-(A1-Pad5)">
+      <node ref="A1" pin="5" pinfunction="SCB" pintype="bidirectional"/>
+    </net>
+    <net code="9" name="unconnected-(A1-Pad6)">
+      <node ref="A1" pin="6" pinfunction="SDO" pintype="bidirectional"/>
+    </net>
+    <net code="10" name="unconnected-(A2-Pad3)">
+      <node ref="A2" pin="3" pinfunction="N/C" pintype="no_connect"/>
+    </net>
+    <net code="11" name="unconnected-(X1-Pad4)">
+      <node ref="X1" pin="4" pinfunction="Pin_4" pintype="passive"/>
+    </net>
+    <net code="12" name="unconnected-(X1-Pad5)">
+      <node ref="X1" pin="5" pinfunction="Pin_5" pintype="passive"/>
+    </net>
+    <net code="13" name="unconnected-(X1-Pad10)">
+      <node ref="X1" pin="10" pinfunction="Pin_10" pintype="passive"/>
+    </net>
+    <net code="14" name="unconnected-(X1-Pad11)">
+      <node ref="X1" pin="11" pinfunction="Pin_11" pintype="passive"/>
+    </net>
+    <net code="15" name="unconnected-(X1-Pad12)">
+      <node ref="X1" pin="12" pinfunction="Pin_12" pintype="passive"/>
+    </net>
+    <net code="16" name="unconnected-(X2-Pad4)">
+      <node ref="X2" pin="4" pinfunction="Pin_4" pintype="passive"/>
+    </net>
+    <net code="17" name="unconnected-(X2-Pad5)">
+      <node ref="X2" pin="5" pinfunction="Pin_5" pintype="passive"/>
+    </net>
+    <net code="18" name="unconnected-(X2-Pad7)">
+      <node ref="X2" pin="7" pinfunction="Pin_7" pintype="passive"/>
+    </net>
+    <net code="19" name="unconnected-(X2-Pad9)">
+      <node ref="X2" pin="9" pinfunction="Pin_9" pintype="passive"/>
+    </net>
+    <net code="20" name="unconnected-(X2-Pad11)">
+      <node ref="X2" pin="11" pinfunction="Pin_11" pintype="passive"/>
+    </net>
+    <net code="21" name="unconnected-(X2-Pad12)">
+      <node ref="X2" pin="12" pinfunction="Pin_12" pintype="passive"/>
+    </net>
+  </nets>
+</export>

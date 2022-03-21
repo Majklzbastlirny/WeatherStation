@@ -1,0 +1,26 @@
+"Source:","C:\Users\Michal\Documents\GitHub\WeatherStation\Hardware\KiCad-Files\Pressure-temperature-humidity_board\Pressure-temperature-humidity_board.kicad_sch"
+"Date:","21.03.2022 10:10:33"
+"Tool:","Eeschema (6.0.0)"
+"Generator:","C:\Program Files\KiCad\6.0\bin\scripting\plugins/bom_csv_grouped_by_value.py"
+"Component Count:","6"
+
+"Individual Components:"
+
+"Item","Qty","Reference(s)","Value","LibPart","Footprint","Datasheet"
+"","","A1","BMP(E)_180(280)","BMP(E)_180(280):BMP(E)_180(280)","Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",""
+"","","A2","DHT22","DHT22:DHT22","Sensor:Aosong_DHT11_5.5x12.0_P2.54mm",""
+"","","C1","100u","Device:C_Polarized","Capacitor_THT:C_Disc_D12.5mm_W5.0mm_P7.50mm","~"
+"","","R1","10k","Device:R","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","~"
+"","","X1","Conn_01x12","Connector_Generic:Conn_01x12","Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal","~"
+"","","X2","Conn_01x12","Connector_Generic:Conn_01x12","Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal","~"
+
+
+
+"Collated Components:"
+
+"Item","Qty","Reference(s)","Value","LibPart","Footprint","Datasheet"
+"1","1","A1","BMP(E)_180(280)","BMP(E)_180(280):BMP(E)_180(280)","Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",""
+"2","1","A2","DHT22","DHT22:DHT22","Sensor:Aosong_DHT11_5.5x12.0_P2.54mm",""
+"3","1","C1","100u","Device:C_Polarized","Capacitor_THT:C_Disc_D12.5mm_W5.0mm_P7.50mm","~"
+"4","1","R1","10k","Device:R","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","~"
+"5","2","X1, X2","Conn_01x12","Connector_Generic:Conn_01x12","Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Horizontal","~"
