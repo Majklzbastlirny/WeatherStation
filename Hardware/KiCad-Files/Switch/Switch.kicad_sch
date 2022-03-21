@@ -586,7 +586,7 @@
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 1918cae9-b2f4-4c8e-8614-5db4a62e804b)
     (property "Reference" "R1" (id 0) (at 102.87 93.98 90))
-    (property "Value" "R" (id 1) (at 102.87 96.52 90))
+    (property "Value" "330" (id 1) (at 102.87 96.52 90))
     (property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" (id 2) (at 102.87 102.108 90)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -876,7 +876,7 @@
       (reference "Q1") (unit 1) (value "BUZ11") (footprint "Package_TO_SOT_THT:TO-220-3_Vertical")
     )
     (path "/1918cae9-b2f4-4c8e-8614-5db4a62e804b"
-      (reference "R1") (unit 1) (value "R") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+      (reference "R1") (unit 1) (value "330") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
     )
     (path "/37c7f389-d05f-4660-8dc1-f9bb2fa29cf4"
       (reference "R2") (unit 1) (value "10k") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")

@@ -1250,7 +1250,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x06") (at 204.47 59.69 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 74244b9c-c825-4f1a-8b96-f3b051d373b6)
-    (property "Reference" "J2" (id 0) (at 207.01 59.6899 0)
+    (property "Reference" "X2" (id 0) (at 207.01 59.6899 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Conn_01x06" (id 1) (at 207.01 62.2299 0)
@@ -1305,7 +1305,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x02") (at 71.12 110.49 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 92202be8-5406-4a1d-bf47-5cd2538fcd51)
-    (property "Reference" "J1" (id 0) (at 71.12 104.14 0))
+    (property "Reference" "X1" (id 0) (at 71.12 104.14 0))
     (property "Value" "Conn_01x02" (id 1) (at 71.12 106.68 0))
     (property "Footprint" "" (id 2) (at 71.12 110.49 0)
       (effects (font (size 1.27 1.27)) hide)
@@ -1320,7 +1320,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x04") (at 219.71 74.93 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 98406805-7176-44f6-971f-9a07303b0a80)
-    (property "Reference" "J3" (id 0) (at 222.25 74.9299 0)
+    (property "Reference" "X3" (id 0) (at 222.25 74.9299 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Conn_01x04" (id 1) (at 222.25 77.4699 0)
@@ -1500,15 +1500,6 @@
     (path "/58103768-c0eb-47b9-8b0b-7fef9f463c34"
       (reference "C2") (unit 1) (value "100n") (footprint "")
     )
-    (path "/92202be8-5406-4a1d-bf47-5cd2538fcd51"
-      (reference "J1") (unit 1) (value "Conn_01x02") (footprint "")
-    )
-    (path "/74244b9c-c825-4f1a-8b96-f3b051d373b6"
-      (reference "J2") (unit 1) (value "Conn_01x06") (footprint "")
-    )
-    (path "/98406805-7176-44f6-971f-9a07303b0a80"
-      (reference "J3") (unit 1) (value "Conn_01x04") (footprint "")
-    )
     (path "/02ff3d26-cb04-42cd-9713-673e1faa89f1"
       (reference "R1") (unit 1) (value "10k") (footprint "")
     )
@@ -1532,6 +1523,15 @@
     )
     (path "/345184b2-61db-45f0-a821-254c0920249b"
       (reference "U2") (unit 1) (value "ESP-12S") (footprint "ESP-12S")
+    )
+    (path "/92202be8-5406-4a1d-bf47-5cd2538fcd51"
+      (reference "X1") (unit 1) (value "Conn_01x02") (footprint "")
+    )
+    (path "/74244b9c-c825-4f1a-8b96-f3b051d373b6"
+      (reference "X2") (unit 1) (value "Conn_01x06") (footprint "")
+    )
+    (path "/98406805-7176-44f6-971f-9a07303b0a80"
+      (reference "X3") (unit 1) (value "Conn_01x04") (footprint "")
     )
   )
 )
