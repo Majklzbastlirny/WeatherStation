@@ -194,8 +194,8 @@ void loop() {
   ReadBMP();
   MeasureUV();
   ReadAngle();
-  ReadDHT();
   ReadSpeed();
+  ReadDHT();
 
   digitalWrite(SensorPWR, LOW);
   WiFi_Connect();
