@@ -120,7 +120,7 @@ double T, P, p0;
 RTC_DATA_ATTR bool HeatOn = 0;
 int MinTemp = -5;
 #define HeatPin 4
-bool Heatin = 0;
+RTC_DATA_ATTR bool Heatin = 0;
 
 //Proměnné k senzoru napětí
 #define voltmeas 32
@@ -169,8 +169,10 @@ void setup() {
 
   pinMode(AnemoPIN, INPUT);
   pinMode(HeatPin, OUTPUT);
-
-
+  if (Heatin == 1) {
+    digitalWrite(HeatPin, HIGH);
+  }
+  else {}
 
   digitalWrite(HeatPin, LOW);
   digitalWrite(SensorPWR, HIGH);
@@ -490,6 +492,8 @@ void WiFi_Connect() {
     }
     else {
       digitalWrite(SensorPWR, LOW);
+      digitalWrite(HeatPin, LOW);
+
       ESP.restart();
     }
   }
@@ -515,6 +519,7 @@ void MQTT_Connect() {
   Sprintln("Připojuji se k MQTT serveru ");
 
   uint8_t retries = 6;
+  mqtt.connect();
   while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
     Sprintln(mqtt.connectErrorString(ret));
     Sprintln("Nepodařilo se mi připojit k MQTT serveru. Zkusím to znovu za 5 sekund.");
@@ -524,6 +529,8 @@ void MQTT_Connect() {
     if (retries == 0) {
       // basically die and wait for user to reset me
       digitalWrite(SensorPWR, LOW);
+      digitalWrite(HeatPin, LOW);
+
       ESP.restart();
     }
   }
@@ -669,6 +676,7 @@ void WiFi_Disconnect() {
 //Kód pro přechodu mikrokontroleru do režimu hibernace
 void Hibernace() {
   digitalWrite(SensorPWR, LOW);
+  digitalWrite(HeatPin, LOW);
 
   Sprintln("Jdu do režimu hibernace");
   esp_sleep_enable_timer_wakeup(DOBA_HIBERNACE * 1000000);
