@@ -17,14 +17,14 @@
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID         "Edma_Loznice"
+#define WLAN_SSID         "Edma_Pergola"
 #define WLAN_PASS         "pes_Fido"
 
 
 /************************* MQTT Broker Setup *********************************/
 
-#define MQTT_BROKER_IP    "bladyhel.serveminecraft.net"
-#define MQTT_BROKER_PORT  21    //default port is 1883
+#define MQTT_BROKER_IP    "192.168.0.8"
+#define MQTT_BROKER_PORT  1883    //default port is 1883
 #define MQTT_USERNAME     "admin"
 #define MQTT_PASSWORD     "123456780"
 
@@ -518,7 +518,7 @@ void MQTT_Connect() {
 
   Sprintln("Připojuji se k MQTT serveru ");
 
-  uint8_t retries = 6;
+  uint8_t retries = 4;
   mqtt.connect();
   while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
     Sprintln(mqtt.connectErrorString(ret));
