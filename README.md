@@ -3,7 +3,7 @@
 Weather Station with ESP32, ESP8266, MQTT, InfluxDB and Grafana.
 
 
-This is my maturita project.
+This is my maturita (finals) project.
 
 Public API: https://weatherapi.majkl.tk
 
