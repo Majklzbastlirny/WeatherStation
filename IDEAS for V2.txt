@@ -1,0 +1,4 @@
+LoRa/LoRaWan - 4 msg/hour https://avbentem.github.io/airtime-calculator/ttn/eu868/180,15
+hybrid approach, software update ONLY local (station - Display), data publishing LoRaWan and Local lora to RPI (Display & DB unit)
+Light sensor - VEML7700 (Vishay)
+Humidity, Pressure, temperature - BME680(688) (Bosch sensortek)
