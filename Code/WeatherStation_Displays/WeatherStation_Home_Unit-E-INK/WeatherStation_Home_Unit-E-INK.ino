@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <ESP32Ping.h>
 #include <Arduino.h>
 #include <esp_task_wdt.h>
 #include "freertos/FreeRTOS.h"
@@ -34,7 +35,8 @@ byte FAILsleep = 30;  //Čas spánku v minutách
 
 
 //#define INFLUXDB_URL "http://192.168.0.8:8086"
-#define INFLUXDB_URL "http://bladyhel.serveminecraft.net:8086"
+//#define INFLUXDB_URL "http://bladyhel.serveminecraft.net:8086"
+String INFLUXDB_URL = "http://bladyhel.serveminecraft.net:8086";
 #define INFLUXDB_TOKEN "H4hYgXBEUTFRivBBLdo0Pk_ca1qCAmN8O-LRGjRLRoVitVGcSfervwQQOKa8Jka7rwDa2m7EDlqZn_MmNqsezQ=="
 #define INFLUXDB_ORG "2d5652347a7565e5"
 #define INFLUXDB_BUCKET "WeatherStation"
@@ -503,6 +505,17 @@ void WiFi_Connect() {
   Serial.print("Síla WiFi signálu je: ");
   Serial.print(rssi);
   Serial.println(" dBm");
+
+  //test connection
+  bool success = Ping.ping("8.8.8.8", 3);
+  if (!success) {
+    Serial.println("Ping failed");
+   INFLUXDB_URL = "http://192.168.0.8:8086";
+    return;
+  }
+
+  Serial.println("Ping succesful.");
+ 
 }
 
 void TimeSync() {

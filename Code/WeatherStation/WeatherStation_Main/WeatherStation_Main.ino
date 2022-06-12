@@ -17,7 +17,7 @@
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID         "Edma_Pergola"
+#define WLAN_SSID         "Edma_Venku"
 #define WLAN_PASS         "pes_Fido"
 
 
@@ -63,7 +63,7 @@ Adafruit_MQTT_Publish Precipitation = Adafruit_MQTT_Publish(&mqtt, "WeatherStati
 //#define Sprint(a)
 
 
-#define DOBA_HIBERNACE 60 //v sekundách
+#define DOBA_HIBERNACE 120 //v sekundách
 #define mezera 10000 //mezera mezi měřením (v ms)
 #define LEDDIAG 2
 int rescnt = 0;
@@ -82,7 +82,7 @@ float ws = 0; //V M/S
 float wsm = 0;
 #define AnemoPIN  35
 
-float AnemoTime = 20000; //doba měření rychlosti v ms
+float AnemoTime = 10; //doba měření rychlosti v s
 byte pulses = 0;
 
 //Proměnné k senzoru intenzity UV zařízení
@@ -462,9 +462,9 @@ void ReadDHT() {
 //Kód pro měření rychlosti větru
 void ReadSpeed() {
   attachInterrupt(AnemoPIN, ISR, FALLING);
-  delay(AnemoTime);
+  delay(AnemoTime*1000);
   detachInterrupt(AnemoPIN);
-  ws = 2 * PI * 0.08 * (pulses / AnemoTime / 2 * 1000);
+  ws = ((pulses/4)/AnemoTime); //obvod je 50cm, 4 imp = 1m/s
   Sprint("Rychlost větru: ");
   Sprint(ws);
   Sprint(" m/s = ");
