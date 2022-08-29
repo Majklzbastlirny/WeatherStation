@@ -21,6 +21,12 @@
 
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+DHT dht(0, DHT22);
+
+
+double HeatIndex = 0;
 
 
 #define I2C_SDA 14
@@ -124,13 +130,13 @@ int vref = 1100;
 Rect_t area1 = {
   .x = 585,
   .y = 60,
-  .width = 300,
+  .width = 290,
   .height = 60
 };
 Rect_t ConnectArea = {
   .x = 225,
   .y = 0,
-  .width = 375,
+  .width = 360,
   .height = 60
 };
 
@@ -282,6 +288,9 @@ void setup()
   Serial.print(bme.readHumidity());
   Serial.println(" %");
 
+  Serial.print("HeatIndex ");
+  Serial.print(dht.computeHeatIndex(bme.readTemperature(), bme.readHumidity(), false));
+
 
 
   char temp[64];
@@ -293,6 +302,8 @@ void setup()
   char pressraw[64];
   dtostrf((bme.readPressure() / 100), 6, 2, pressraw);
 
+  char hindex[64];
+  dtostrf(dht.computeHeatIndex(bme.readTemperature(), bme.readHumidity(), false), 5, 2, hindex);
 
 
   epd_poweron();
@@ -413,23 +424,28 @@ void setup()
   cursor_y = 450;
   writeln((GFXfont *)&OpenSans24B, "Doma", &cursor_x, &cursor_y, framebuffer);
 
-  cursor_x = 100;
+  cursor_x = 40;
   cursor_y += 30;
   writeln((GFXfont *)&OpenSans10B, "Teplota", &cursor_x, &cursor_y, framebuffer);
-  cursor_x = 290;
-
+  cursor_x += 100;
   writeln((GFXfont *)&OpenSans10B, "Relativni vlhkost", &cursor_x, &cursor_y, framebuffer);
+  cursor_x += 35;
+  writeln((GFXfont *)&OpenSans10B, "Pocitova teplota", &cursor_x, &cursor_y, framebuffer);
 
-
-  cursor_x = 100;
+  cursor_x = 40;
   cursor_y = 520;
   writeln((GFXfont *)&FiraSans, temp, &cursor_x, &cursor_y, framebuffer);
 
   writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
-  cursor_x += 40;
+  cursor_x += 50;
   writeln((GFXfont *)&FiraSans, hum, &cursor_x, &cursor_y, framebuffer);
 
   writeln((GFXfont *)&FiraSans, " %", &cursor_x, &cursor_y, framebuffer);
+
+  cursor_x += 50;
+  writeln((GFXfont *)&FiraSans, hindex, &cursor_x, &cursor_y, framebuffer);
+
+  writeln((GFXfont *)&FiraSans, " °C", &cursor_x, &cursor_y, framebuffer);
 
   LastUpdate();
 
@@ -515,11 +531,12 @@ void WiFi_Connect() {
   }
 
   Serial.println("Ping succesful.");
- 
+ InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
+
 }
 
 void TimeSync() {
-  timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
+  timeSync(TZ_INFO, "time.cloudflare.com", "192.168.0.1");
   setenv("TZ", TZ_INFO, 1);
   time_t tnow = time(nullptr);
   Serial.print("Čas nyní: ");
