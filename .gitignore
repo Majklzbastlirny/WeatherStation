@@ -49,3 +49,5 @@ Code/Backend/InfluxDB_API_internal_request.txt
 Documentation/Main_Board_Traces.BMP
 E18-UCP-Sou-Basler Michal-Meteostanice/
 E18-UCP-Sou-Basler Michal-Meteostanice.zip
+Code/Backend/APIv2/__pycache__/api.cpython-310.pyc
+Code/Backend/APIv2/api.py
